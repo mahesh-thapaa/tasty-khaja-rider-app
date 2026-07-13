@@ -16,7 +16,7 @@ class LeadsScreen extends StatefulWidget {
 }
 
 class _LeadsScreenState extends State<LeadsScreen> {
-  bool _isFormVisible = true;
+  bool _isFormVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "My Leeds",
+                            "My Leads",
                             style: TextStyle(
                               color: AppColors.shadowColor,
                               fontSize: 20.sp,

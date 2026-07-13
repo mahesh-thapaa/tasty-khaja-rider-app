@@ -53,7 +53,7 @@ class ProfileScreen extends StatelessWidget {
                       "Logout",
                       style: TextStyle(
                         color: AppColors.primaryColor,
-                        fontSize: 16.sp,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

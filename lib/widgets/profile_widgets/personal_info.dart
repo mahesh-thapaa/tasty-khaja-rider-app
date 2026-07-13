@@ -15,12 +15,9 @@ class PersonalInfo extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 20.w),
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.textColor,
         borderRadius: BorderRadius.circular(24.r),
-        border: Border.all(
-          color: const Color(0xFFE2E8F0), // Subtle light-grey border outline
-          width: 1.w,
-        ),
+        border: Border.all(color: AppColors.textColor, width: 1.w),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,7 +28,7 @@ class PersonalInfo extends StatelessWidget {
             "PERSONAL INFORMATION",
             style: TextStyle(
               color: AppColors.navBarColor,
-              fontSize: 12.sp,
+              fontSize: 11.sp,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.8,
             ),
@@ -43,6 +40,8 @@ class PersonalInfo extends StatelessWidget {
             label: "EMAIL ADDRESS",
             value: profile.email,
             labelColor: AppColors.navBarColor,
+            labelFontSize: 10.sp,
+
             valueColor: AppColors.shadowColor,
           ),
           SizedBox(height: 11.h),
@@ -53,6 +52,8 @@ class PersonalInfo extends StatelessWidget {
             value: profile.phone,
             labelColor: AppColors.navBarColor,
             valueColor: AppColors.shadowColor,
+
+            labelFontSize: 10.sp,
           ),
         ],
       ),
@@ -65,6 +66,8 @@ class PersonalInfo extends StatelessWidget {
     required String value,
     required Color labelColor,
     required Color valueColor,
+    double? labelFontSize,
+    double? valueFontSize,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
