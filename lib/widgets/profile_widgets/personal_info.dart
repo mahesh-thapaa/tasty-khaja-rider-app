@@ -67,7 +67,7 @@ class PersonalInfo extends StatelessWidget {
     required Color labelColor,
     required Color valueColor,
     double? labelFontSize,
-    double? valueFontSize,
+    // double? valueFontSize,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,

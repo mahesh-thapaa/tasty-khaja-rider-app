@@ -33,10 +33,10 @@ class ProfileScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 14.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF1F2),
+                  color: AppColors.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(
-                    color: const Color(0xFFFECDD3),
+                    color: AppColors.primaryColor.withValues(alpha: 0.3),
                     width: 1.w,
                   ),
                 ),
