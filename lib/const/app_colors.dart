@@ -10,4 +10,5 @@ class AppColors {
   static const Color containerColor = Color(0xFFF8FAFC);
   static const Color paymentColor = Color(0xFFD97706);
   static const Color paymentBorderColor = Color(0xFFFFF7ED);
+  static const Color paidColor = Color(0xFF00A63E);
 }

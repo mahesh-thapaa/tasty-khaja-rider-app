@@ -1,3 +1,4 @@
+import 'package:rider/models/pool_models/order_items_models.dart';
 import 'package:rider/models/pool_models/order_models.dart';
 
 final sampleOrder = Order(

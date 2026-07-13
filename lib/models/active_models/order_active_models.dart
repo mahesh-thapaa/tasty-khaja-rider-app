@@ -1,18 +1,7 @@
 import 'package:rider/models/pool_models/order_items_models.dart';
+import 'package:rider/models/pool_models/order_models.dart';
 
-class Coordinates {
-  final double latitude;
-  final double longitude;
-
-  Coordinates({
-    required this.latitude,
-    required this.longitude,
-  });
-}
-
-
-
-class Order {
+class OrderActiveModels {
   final String id;
   final String paymentMethod;
   final String deliveryLocationName;
@@ -20,8 +9,10 @@ class Order {
   final String distance;
   final List<OrderItem> items;
   final double deliveryCharge;
+  final String customerName;
+  final String customerPhone;
 
-  Order({
+  OrderActiveModels({
     required this.id,
     required this.paymentMethod,
     required this.deliveryLocationName,
@@ -29,6 +20,8 @@ class Order {
     required this.distance,
     required this.items,
     required this.deliveryCharge,
+    required this.customerName,
+    required this.customerPhone,
   });
 
   double get subtotal {

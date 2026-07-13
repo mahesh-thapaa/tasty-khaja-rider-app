@@ -10,7 +10,6 @@ import 'package:rider/widgets/pool_widgets/empty_pool_widgets.dart';
 import 'package:rider/widgets/pool_widgets/order_cart_widgets.dart';
 
 class PoolScreen extends StatelessWidget {
-  // Populate active pool list dynamically with the data sample model
   final List<Order> active = [sampleOrder];
 
   PoolScreen({super.key});
@@ -39,7 +38,6 @@ class PoolScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 2.h),
                     Text(
                       "Tap to accept an order",
                       style: TextStyle(

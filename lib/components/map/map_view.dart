@@ -4,11 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:rider/const/app_colors.dart';
 
-class OrderMapView extends StatelessWidget {
+class MapView extends StatelessWidget {
   final double latitude;
   final double longitude;
 
-  const OrderMapView({
+  const MapView({
     super.key,
     required this.latitude,
     required this.longitude,
