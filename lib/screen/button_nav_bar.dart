@@ -24,16 +24,16 @@ class ButtonNavBar extends StatelessWidget {
     Widget targetScreen;
     switch (index) {
       case 0:
-        targetScreen = const PoolScreen();
+        targetScreen =  PoolScreen();
         break;
       case 1:
-        targetScreen = const ActiveScreens();
+        targetScreen =  ActiveScreens();
         break;
       case 2:
-        targetScreen = const LeadsScreen();
+        targetScreen =  LeadsScreen();
         break;
       case 3:
-        targetScreen = const ProfileScreen();
+        targetScreen =  ProfileScreen();
         break;
       default:
         return;
