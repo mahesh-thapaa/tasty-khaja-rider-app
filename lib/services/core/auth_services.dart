@@ -16,14 +16,23 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        final loginResponse = LoginResponseModel.fromJson(response.data);
+        String? token;
+        final setCookie = response.headers.value('set-cookie');
+        if (setCookie != null) {
+          final match = RegExp(r'token=([^;]+)').firstMatch(setCookie);
+          if (match != null) {
+            token = match.group(1);
+          }
+        }
 
-        if (loginResponse.token != null) {
+        if (token != null) {
           await _secureStorage.write(
             key: 'rider_auth_token',
-            value: loginResponse.token!,
+            value: token,
           );
         }
+
+        final loginResponse = LoginResponseModel.fromJson(response.data);
         return loginResponse;
       }
       return null;

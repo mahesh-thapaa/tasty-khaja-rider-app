@@ -15,7 +15,7 @@ class ApiClient {
         onRequest: (options, handler) async {
           String? token = await _secureStorage.read(key: 'rider_auth_token');
           if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
+            options.headers['Cookie'] = 'token=$token';
           }
           return handler.next(options);
         },

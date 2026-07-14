@@ -8,4 +8,12 @@ class OrderItem {
     required this.quantity,
     required this.price,
   });
+
+  factory OrderItem.fromJson(Map<String, dynamic> json) {
+    return OrderItem(
+      name: json['name'] ?? '',
+      quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
 }
