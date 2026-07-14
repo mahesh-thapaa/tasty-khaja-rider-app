@@ -7,6 +7,7 @@ import 'package:rider/models/active_models/order_active_models.dart';
 import 'package:rider/screen/button_nav_bar.dart';
 import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/services/orders/active_services.dart';
+import 'package:rider/services/orders/mark_delivered_services.dart';
 import 'package:rider/services/orders/mark_paid_services.dart';
 import 'package:rider/widgets/active_widgets/empty_active_widgets.dart';
 import 'package:rider/widgets/active_widgets/order_payment_widgets.dart';
@@ -21,6 +22,7 @@ class ActiveScreens extends StatefulWidget {
 class _ActiveScreensState extends State<ActiveScreens> {
   final ActiveService _activeService = ActiveService();
   final MarkPaidService _markPaidService = MarkPaidService();
+  final MarkDeliveredService _markDeliveredService = MarkDeliveredService();
   List<OrderActiveModels> _active = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -49,6 +51,32 @@ class _ActiveScreensState extends State<ActiveScreens> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: AppColors.primaryColor,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _markDelivered(OrderActiveModels order) async {
+    try {
+      await _markDeliveredService.markOrderDelivered(order.mongoId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Order delivered'),
+          backgroundColor: AppColors.activeColor,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      setState(() {
+        _active.removeWhere((o) => o.mongoId == order.mongoId);
+      });
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -195,6 +223,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
             order: order,
             isPaid: _paidOrderIds.contains(order.mongoId),
             onMarkPaid: (method) => _markPaid(order, method),
+            onMarkDelivered: () => _markDelivered(order),
           ),
         );
       },
