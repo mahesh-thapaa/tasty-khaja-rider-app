@@ -5,6 +5,7 @@ import 'package:rider/models/pool_models/order_models.dart';
 import 'package:rider/screen/button_nav_bar.dart';
 import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/components/top_bar_components/top_bar.dart';
+import 'package:rider/services/orders/accept_order_service.dart';
 import 'package:rider/services/orders/pool_services.dart';
 import 'package:rider/widgets/pool_widgets/empty_pool_widgets.dart';
 import 'package:rider/widgets/pool_widgets/order_cart_widgets.dart';
@@ -18,6 +19,7 @@ class PoolScreen extends StatefulWidget {
 
 class _PoolScreenState extends State<PoolScreen> {
   final PoolServices _poolServices = PoolServices();
+  final AcceptOrderService _acceptOrderService = AcceptOrderService();
   List<Order> _activeOrders = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -45,6 +47,30 @@ class _PoolScreenState extends State<PoolScreen> {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _acceptOrder(Order order) async {
+    try {
+      await _acceptOrderService.acceptOrder(order.mongoId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Order accepted!'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      _fetchOrders();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -154,7 +180,10 @@ class _PoolScreenState extends State<PoolScreen> {
         final order = _activeOrders[index];
         return Padding(
           padding: EdgeInsets.only(bottom: 16.h),
-          child: OrderCardWidget(order: order),
+          child: OrderCardWidget(
+            order: order,
+            onAccept: () => _acceptOrder(order),
+          ),
         );
       },
     );

@@ -6,8 +6,9 @@ import '../../components/map/map_view.dart';
 
 class OrderCardWidget extends StatelessWidget {
   final Order order;
+  final VoidCallback? onAccept;
 
-  const OrderCardWidget({super.key, required this.order});
+  const OrderCardWidget({super.key, required this.order, this.onAccept});
 
   @override
   Widget build(BuildContext context) {
@@ -251,7 +252,7 @@ class OrderCardWidget extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: onAccept,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: AppColors.textColor,

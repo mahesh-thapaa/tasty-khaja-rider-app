@@ -19,6 +19,7 @@ class Coordinates {
 
 class Order {
   final String id;
+  final String mongoId;
   final String paymentMethod;
   final String deliveryLocationName;
   final Coordinates coordinates;
@@ -28,6 +29,7 @@ class Order {
 
   Order({
     required this.id,
+    required this.mongoId,
     required this.paymentMethod,
     required this.deliveryLocationName,
     required this.coordinates,
@@ -73,6 +75,7 @@ class Order {
 
     return Order(
       id: json['orderId'] ?? json['_id'] ?? '',
+      mongoId: json['_id'] ?? '',
       paymentMethod: json['paymentMethod'] ?? 'COD', // Default value if not specified
       deliveryLocationName: fullAddress,
       coordinates: Coordinates.fromJson(json['userLocation'] ?? {}),

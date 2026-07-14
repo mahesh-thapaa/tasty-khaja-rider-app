@@ -1,8 +1,9 @@
 import 'package:rider/models/pool_models/order_items_models.dart';
 import 'package:rider/models/pool_models/order_models.dart';
 
-final sampleOrder = Order(
+final sampleOrder = (
   id: 'CK-1001',
+  mongoId: '64a9c1e8f4d2c3001c8b4567',
   paymentMethod: 'COD',
   deliveryLocationName: 'Amarsingh chowk',
   coordinates: Coordinates(latitude: 28.2108, longitude: 83.9835),
