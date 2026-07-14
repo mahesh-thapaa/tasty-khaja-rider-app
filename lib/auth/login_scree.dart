@@ -22,7 +22,7 @@ class LoginScree extends StatelessWidget {
             child: Center(
               child: Container(
                 width: cardWidth,
-                color: AppColors.paymentBorderColor,
+                color: AppColors.containerColor,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -53,11 +53,7 @@ class LoginScree extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 2.h),
-                    TextfieldsWidgets(
-                      onSubmitted: (loginData) {
-                        // TODO: Implement login logic with loginData.email and loginData.password
-                      },
-                    ),
+                    TextfieldsWidgets(onSubmitted: (loginData) {}),
                   ],
                 ),
               ),

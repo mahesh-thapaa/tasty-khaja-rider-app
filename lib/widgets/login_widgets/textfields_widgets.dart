@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rider/const/app_colors.dart';
 import 'package:rider/models/login_models/login_models.dart';
-
-
 
 class TextfieldsWidgets extends StatefulWidget {
   final Function(LoginModels) onSubmitted;
@@ -18,10 +17,6 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  static const Color labelAndIconColor = Color(0xFF5A4A42); // Warm dark brown
-  static const Color fieldBackgroundColor = Color(0xFFF6F4F4); // Off-white/light warm grey
-  static const Color hintTextColor = Color(0xFF8A939E); // Muted slate grey
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -31,13 +26,11 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      // 2. Instantiate your LoginModels when validation succeeds
       final loginData = LoginModels(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
-      // Pass the model back to your parent screen or authentication function
       widget.onSubmitted(loginData);
     }
   }
@@ -49,20 +42,19 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // --- Email Text Field ---
           const Text(
             'Email',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: labelAndIconColor,
+              color: AppColors.labelAndIconColor,
             ),
           ),
           const SizedBox(height: 8.0),
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            style: const TextStyle(color: labelAndIconColor),
+            style: const TextStyle(color: AppColors.labelAndIconColor),
             decoration: _buildInputDecoration(
               hintText: 'Enter your email',
               prefixIcon: Icons.mail_outline,
@@ -82,21 +74,23 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: labelAndIconColor,
+              color: AppColors.labelAndIconColor,
             ),
           ),
           const SizedBox(height: 8.0),
           TextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
-            style: const TextStyle(color: labelAndIconColor),
+            style: const TextStyle(color: AppColors.labelAndIconColor),
             decoration: _buildInputDecoration(
               hintText: 'Enter your password',
               prefixIcon: Icons.lock_outline,
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                  color: labelAndIconColor,
+                  _obscurePassword
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: AppColors.labelAndIconColor,
                   size: 20,
                 ),
                 onPressed: () {
@@ -115,11 +109,10 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
           ),
           const SizedBox(height: 24.0),
 
-          // Trigger submit button
           ElevatedButton(
             onPressed: _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFB91C1C),
+              backgroundColor: AppColors.primaryColor,
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0),
@@ -127,7 +120,10 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
             ),
             child: const Text(
               'Sign In',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppColors.textColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -135,7 +131,6 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
     );
   }
 
-  // Helper method to keep your styling clean and unified
   InputDecoration _buildInputDecoration({
     required String hintText,
     required IconData prefixIcon,
@@ -143,21 +138,24 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
   }) {
     return InputDecoration(
       hintText: hintText,
-      hintStyle: const TextStyle(
+      hintStyle: TextStyle(
         fontSize: 14,
-        color: hintTextColor,
+        color: AppColors.navBarColor.withValues(alpha: 0.5),
       ),
       prefixIcon: Icon(
         prefixIcon,
-        color: labelAndIconColor,
+        color: AppColors.labelAndIconColor,
         size: 22,
       ),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: fieldBackgroundColor,
-      contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+      fillColor: AppColors.navBarColor.withValues(alpha: 0.05),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 16.0,
+        horizontal: 16.0,
+      ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16.0), // Rounded pill styling
+        borderRadius: BorderRadius.circular(16.0),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
@@ -167,7 +165,7 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16.0),
         borderSide: const BorderSide(
-          color: labelAndIconColor,
+          color: AppColors.paymentBorderColor,
           width: 1.0,
         ),
       ),
