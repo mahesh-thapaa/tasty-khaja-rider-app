@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rider/const/app_colors.dart';
-import 'package:rider/models/leeds_models.dart/info_models.dart';
+import 'package:rider/models/leeds_models/info_models.dart';
 
 class LeadItemCard extends StatelessWidget {
   final InfoModels lead;

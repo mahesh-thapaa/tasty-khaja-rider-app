@@ -23,7 +23,7 @@
 
 ### Base URL
 ```
-Production: https://tastykhaja.com/api
+Production: https://api.tastykhaja.com/api
 Development: http://localhost:5001/api
 ```
 
@@ -597,6 +597,7 @@ variants: '[
             }
           ]
         },
+        "itemType": "Food",
         "variantId": "607f1f77bcf86cd799439013",
         "quantity": 2
       }
@@ -606,6 +607,8 @@ variants: '[
   }
 }
 ```
+
+**Note:** `itemType` is `"Food"` or `"DailySpecial"`. The `foodItem` field is a polymorphic reference (Mongoose `refPath`) — it populates from the `Food` collection or the `DailySpecial` collection depending on `itemType`. Both models expose the same `variants` shape (`label`, `price`, `discountedPrice`, `points`, `isAvailable`), so cart/checkout logic reads them identically regardless of type.
 
 ---
 
@@ -617,10 +620,12 @@ variants: '[
 ```json
 {
   "foodItemId": "507f1f77bcf86cd799439011",
+  "itemType": "Food",
   "variantId": "607f1f77bcf86cd799439013",
   "quantity": 2
 }
 ```
+- `itemType`: optional, `"Food"` (default) or `"DailySpecial"`. Use `"DailySpecial"` when adding the active daily special to the cart — `foodItemId` should then be the `DailySpecial` document's `_id`.
 
 **Response (200 OK):** Updated cart object (same structure as Get Cart)
 
@@ -695,6 +700,10 @@ variants: '[
 }
 ```
 
+**Important — `requestedDeliveryTime` must be a UTC ISO string:** the client picks the delivery time in the user's local timezone (e.g. via `<input type="datetime-local">`, which yields a timezone-less string like `"2024-01-21T18:00"`). Convert it to a `Date` **in the browser** and send `date.toISOString()`, not the raw string. A timezone-less string parses as "local time of whatever machine parses it" — correct on a dev machine that happens to share the user's timezone, but wrong on a server running in UTC. Sending an explicit `...Z` UTC instant avoids that ambiguity entirely; the backend then does `new Date(requestedDeliveryTime)`, which is unambiguous for `Z`-suffixed strings on any server.
+
+**Cart items may include Daily Special items** (`itemType: "DailySpecial"` on the cart entry) alongside regular Food items — pricing, `discountedPrice`, and `pointsEarned` are resolved from that item's `variants` array exactly as for `Food` items. Each `Food.orderCount` is incremented on order creation (not delivery) for `Food` items only; `DailySpecial` items don't track an order count.
+
 **Response (201 Created):**
 ```json
 {
@@ -707,6 +716,7 @@ variants: '[
       {
         "_id": "607f1f77bcf86cd799439021",
         "foodItem": "507f1f77bcf86cd799439011",
+        "itemType": "Food",
         "name": "Chicken Biryani (Half)",
         "quantity": 2,
         "priceAtPurchase": 300,
@@ -796,7 +806,7 @@ variants: '[
 **Endpoint:** `GET /orders/:id`  
 **Auth:** Required (User or Admin)
 
-**Response (200 OK):** Complete order object
+**Response (200 OK):** Complete order object, with `items.foodItem`, `user` (`_id fullName email phone`), and `rider` (`_id fullName phone email`, `null` if not yet assigned) populated. If the assigned rider account has since been deleted, `rider` will be `null` but the order still retains a `riderName` string snapshot (see Order Model).
 
 ---
 
@@ -810,14 +820,17 @@ variants: '[
   "success": true,
   "data": {
     "totalOrders": 15,
-    "totalSpent": 12500,
-    "averageOrderValue": 833.33,
-    "totalPoints": 250,
-    "cancelledOrders": 1,
-    "lastOrderDate": "2024-01-20T15:45:00.000Z"
+    "activeOrders": 2,
+    "completedOrders": 11,
+    "cancelledOrders": 2,
+    "totalSpent": 9800
   }
 }
 ```
+- `activeOrders`: orders not yet `Delivered` or `Cancelled`.
+- `completedOrders`: orders with `status: "Delivered"`.
+- `cancelledOrders`: orders with `status: "Cancelled"`.
+- `totalSpent`: sum of `totalAmount` for **`Delivered` orders only** — Pending/Preparing/Cancelled orders are excluded so this reflects actual realized revenue for the user, not just cart totals that may still be cancelled.
 
 ---
 
@@ -871,17 +884,40 @@ variants: '[
 }
 ```
 
-**Valid Status Values:** Pending, Preparing, Ready for Delivery, Out for Delivery, Delivered, Cancelled
+**Status flow is fixed and forward-only for admins.** The admin can only move an order along this exact path — any other target status is rejected with `400`:
+
+| Current status | Admin may set it to |
+|---|---|
+| `Pending` | `Preparing` or `Cancelled` |
+| `Preparing` | `Ready for Delivery` |
+| `Ready for Delivery` | — (rider-managed, see below) |
+| `Out for Delivery` | — (rider-managed) |
+| `Delivered` | — (terminal) |
+| `Cancelled` | — (terminal) |
+
+`Ready for Delivery → Out for Delivery → Delivered` is **not** admin-editable via this endpoint — those transitions happen automatically through the rider app: `PUT /rider/orders/:id/accept` sets `Out for Delivery`, and `PUT /rider/orders/:id/deliver` sets `Delivered` (see [Rider Endpoints](#rider-endpoints)).
 
 **Response (200 OK):**
 ```json
 {
   "success": true,
-  "message": "Order status updated",
-  "data": {
-    "_id": "507f1f77bcf86cd799439020",
-    "status": "Preparing"
-  }
+  "message": "Order status updated to Preparing and email sent to customer",
+  "data": { "_id": "507f1f77bcf86cd799439020", "status": "Preparing", "...": "full order object" }
+}
+```
+
+**Error Response (400) — invalid transition:**
+```json
+{
+  "success": false,
+  "message": "Cannot change status from \"Pending\" to \"Delivered\". Allowed next status: Preparing, Cancelled."
+}
+```
+or, for a status with no admin-side transitions:
+```json
+{
+  "success": false,
+  "message": "\"Ready for Delivery\" orders can no longer be changed by an admin. Delivery progress is managed by the rider."
 }
 ```
 
@@ -898,18 +934,25 @@ variants: '[
   "data": {
     "totalOrders": 250,
     "totalRevenue": 125000,
-    "averageOrderValue": 500,
-    "todayOrders": 15,
-    "todayRevenue": 7500,
-    "weeklyRevenue": 45000,
-    "monthlyRevenue": 180000,
+    "totalUsers": 150,
     "pendingOrders": 5,
-    "preparingOrders": 3,
-    "readyOrders": 2,
-    "outForDeliveryOrders": 1
+    "cancelledOrders": 12,
+    "recentOrders": [
+      {
+        "_id": "507f1f77bcf86cd799439020",
+        "orderId": "CK-1042",
+        "status": "Preparing",
+        "distance": 2.5,
+        "totalAmount": 590,
+        "createdAt": "2024-01-21T17:00:00.000Z"
+      }
+    ]
   }
 }
 ```
+- `totalRevenue`: sum of `totalAmount` for **`Delivered` orders only** (same principle as `totalSpent` in Get User Stats).
+- `totalUsers`: count of `User` documents with `role: "user"` (riders excluded).
+- `recentOrders`: latest 5 orders (any status), most recent first.
 
 ---
 
@@ -1497,7 +1540,7 @@ variants: '[
 ---
 
 ### 9. Get All Customers
-**Endpoint:** `GET /admin-users/customers`  
+**Endpoint:** `GET /admin/customers`  
 **Auth:** Required (Admin)
 
 **Query Parameters:**
@@ -1523,37 +1566,39 @@ variants: '[
 ---
 
 ### 10. Get Customer Details
-**Endpoint:** `GET /admin-users/customers/:id`  
+**Endpoint:** `GET /admin/customers/:id`  
 **Auth:** Required (Admin)
 
-**Response (200 OK):** Detailed customer object with all orders
+**Response (200 OK):** Detailed customer object with full order history. `totalSpent` sums `totalAmount` for **`Delivered` orders only** (same Delivered-only rule as Get User Stats / Get Admin Stats — Pending/Preparing/Cancelled orders don't count toward realized spend). `deliveredOrders` is a separate count of delivered orders.
 
 ---
 
 ### 11. Create Rider
-**Endpoint:** `POST /admin-users/riders`  
+**Endpoint:** `POST /admin/riders`  
 **Auth:** Required (Admin)
 
 **Request Body:**
 ```json
 {
-  "name": "Ram Kumar",
+  "fullName": "Ram Kumar",
   "email": "ram@example.com",
-  "phone": "+977981234567"
+  "phone": "+977981234567",
+  "password": "RiderPassword123!"
 }
 ```
+`fullName`, `email`, and `password` are required; `phone` is optional. Fails with `400` if a `User` with that email already exists.
 
 **Response (201 Created):**
 ```json
 {
   "success": true,
+  "message": "Rider created successfully",
   "rider": {
     "_id": "507f1f77bcf86cd799439050",
     "fullName": "Ram Kumar",
     "email": "ram@example.com",
     "phone": "+977981234567",
-    "role": "rider",
-    "isRiderActive": true
+    "role": "rider"
   }
 }
 ```
@@ -1561,49 +1606,112 @@ variants: '[
 ---
 
 ### 12. Get All Riders
-**Endpoint:** `GET /admin-users/riders`  
+**Endpoint:** `GET /admin/riders`  
 **Auth:** Required (Admin)
 
 **Response (200 OK):**
 ```json
-[
-  {
-    "_id": "507f1f77bcf86cd799439050",
-    "fullName": "Ram Kumar",
-    "email": "ram@example.com",
-    "phone": "+977981234567",
-    "role": "rider",
-    "isRiderActive": true,
-    "totalDeliveries": 45,
-    "averageRating": 4.8
-  }
-]
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439050",
+      "fullName": "Ram Kumar",
+      "email": "ram@example.com",
+      "phone": "+977981234567",
+      "role": "rider",
+      "isRiderActive": true,
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
 ```
 
 ---
 
-### 13. Get All Leads
-**Endpoint:** `GET /admin-users/leads`  
+### 13. Update Rider
+**Endpoint:** `PUT /admin/riders/:id`  
+**Auth:** Required (Admin)
+
+**Request Body:** Any subset of `fullName`, `email`, `phone`, `isRiderActive`, `password`. Omit `password` to leave it unchanged.
+```json
+{
+  "fullName": "Ram Kumar Thapa",
+  "isRiderActive": false
+}
+```
+Fails with `400` if changing `email` collides with an existing user's email.
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Rider updated successfully",
+  "data": {
+    "_id": "507f1f77bcf86cd799439050",
+    "fullName": "Ram Kumar Thapa",
+    "email": "ram@example.com",
+    "phone": "+977981234567",
+    "role": "rider",
+    "isRiderActive": false
+  }
+}
+```
+
+---
+
+### 14. Delete Rider
+**Endpoint:** `DELETE /admin/riders/:id`  
 **Auth:** Required (Admin)
 
 **Response (200 OK):**
 ```json
-[
-  {
-    "_id": "507f1f77bcf86cd799439060",
-    "rider": {
-      "_id": "507f1f77bcf86cd799439050",
-      "fullName": "Ram Kumar"
-    },
-    "name": "Restaurant Lead",
-    "phone": "+977981234567",
-    "email": "contact@restaurant.com",
-    "status": "new",
-    "notes": "Interested in partnership",
-    "createdAt": "2024-01-20T15:45:00.000Z"
-  }
-]
+{
+  "success": true,
+  "message": "Rider deleted successfully"
+}
 ```
+
+**Error Response (400) — blocked while the rider has undelivered orders:**
+```json
+{
+  "success": false,
+  "message": "Cannot delete rider: 2 active order(s) are still assigned to them. Reassign or complete these orders first."
+}
+```
+"Active" here means any `Order` assigned to this rider with `status` not in `["Delivered", "Cancelled"]`. Deleting a rider does **not** cascade to their past orders or leads — `Order.riderName` / `Lead.riderName` snapshots remain so those records keep showing the rider's name instead of "Unknown Rider".
+
+---
+
+### 15. Get All Leads
+**Endpoint:** `GET /admin/leads`  
+**Auth:** Required (Admin)
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439060",
+      "clientName": "Restaurant Owner",
+      "organization": "Restaurant Pvt. Ltd.",
+      "address": "123 Main St, New Baneshwor",
+      "phoneNumber": "+977981234567",
+      "rider": {
+        "_id": "507f1f77bcf86cd799439050",
+        "fullName": "Ram Kumar",
+        "email": "ram@example.com",
+        "phone": "+977981234567"
+      },
+      "riderName": "Ram Kumar",
+      "status": "New",
+      "createdAt": "2024-01-20T15:45:00.000Z"
+    }
+  ]
+}
+```
+`status` is one of `New | Contacted | Converted | Rejected`. If the referenced rider account has been deleted, `rider` will be `null`/absent — use the `riderName` string snapshot as the display fallback (this is what the secret-admin Lead Management UI does).
 
 ---
 
@@ -1660,10 +1768,12 @@ variants: '[
     "_id": "507f1f77bcf86cd799439020",
     "status": "Out for Delivery",
     "rider": "507f1f77bcf86cd799439050",
+    "riderName": "Ram Kumar",
     "assignedAt": "2024-01-21T17:30:00.000Z"
   }
 }
 ```
+`riderName` is a snapshot of the rider's `fullName` at assignment time, stored directly on the order. It's used as a display fallback if the rider's account is later deleted (in which case `rider` becomes an orphaned/absent reference but `riderName` still shows correctly).
 
 **Error Response:**
 ```json
@@ -1736,28 +1846,33 @@ variants: '[
 **Request Body:**
 ```json
 {
-  "name": "New Restaurant",
-  "phone": "+977981234567",
-  "email": "contact@newrestaurant.com",
-  "notes": "Interested in our delivery service"
+  "clientName": "New Restaurant Owner",
+  "organization": "New Restaurant Pvt. Ltd.",
+  "address": "123 Main St, New Baneshwor",
+  "phoneNumber": "+977981234567"
 }
 ```
+- `clientName`, `address`, `phoneNumber` are required. `organization` is optional.
 
 **Response (201 Created):**
 ```json
 {
   "success": true,
-  "lead": {
+  "message": "Lead created successfully",
+  "data": {
     "_id": "507f1f77bcf86cd799439060",
+    "clientName": "New Restaurant Owner",
+    "organization": "New Restaurant Pvt. Ltd.",
+    "address": "123 Main St, New Baneshwor",
+    "phoneNumber": "+977981234567",
     "rider": "507f1f77bcf86cd799439050",
-    "name": "New Restaurant",
-    "phone": "+977981234567",
-    "email": "contact@newrestaurant.com",
-    "notes": "Interested in our delivery service",
-    "status": "new"
+    "riderName": "Ram Kumar",
+    "status": "New",
+    "createdAt": "2024-01-21T17:00:00.000Z"
   }
 }
 ```
+`riderName` is a snapshot of the submitting rider's `fullName`, stored on the lead so it still displays correctly if the rider's account is later deleted (see Admin: Delete Rider).
 
 ---
 
@@ -1765,32 +1880,92 @@ variants: '[
 **Endpoint:** `GET /rider/leads`  
 **Auth:** Required (Rider)
 
-**Response (200 OK):** Array of rider's leads
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439060",
+      "clientName": "New Restaurant Owner",
+      "organization": "New Restaurant Pvt. Ltd.",
+      "address": "123 Main St, New Baneshwor",
+      "phoneNumber": "+977981234567",
+      "rider": "507f1f77bcf86cd799439050",
+      "riderName": "Ram Kumar",
+      "status": "New",
+      "createdAt": "2024-01-21T17:00:00.000Z"
+    }
+  ]
+}
+```
+Only leads created by the authenticated rider are returned (`status` is one of `New | Contacted | Converted | Rejected`).
+
+---
+
+### 8. Update Lead
+**Endpoint:** `PUT /rider/leads/:id`  
+**Auth:** Required (Rider)
+
+**Request Body:** Any subset of `clientName`, `address`, `organization`, `phoneNumber`.
+```json
+{
+  "phoneNumber": "+977980000000"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Lead updated successfully",
+  "data": { "_id": "507f1f77bcf86cd799439060", "phoneNumber": "+977980000000", "...": "full lead object" }
+}
+```
+
+**Error Response (403):** returned if the lead does not belong to the requesting rider.
+```json
+{
+  "success": false,
+  "message": "Not authorized to modify this lead"
+}
+```
 
 ---
 
 ## Daily Special Endpoints
 
+Daily Specials use the **same variant pricing model as Food** (`label`, `price`, `discountedPrice`, `points`, `isAvailable` per variant) instead of a single flat price — this lets one special dish offer multiple sizes/portions, each with its own price and loyalty points, exactly like a regular menu item. Only one special can be `isActive: true` system-wide at a time (setting one active deactivates all others). Daily Special items can also be added to the cart / ordered directly (see Cart: Add to Cart, `itemType: "DailySpecial"`).
+
 ### 1. Get Active Daily Specials
 **Endpoint:** `GET /daily-specials/active`  
 **Auth:** Public
 
-**Response (200 OK):**
+**Response (200 OK):** Array with 0 or 1 item — the currently active special, with only its **available** variants included (unavailable variants are filtered out; if none remain available, an empty array is returned).
 ```json
 [
   {
     "_id": "507f1f77bcf86cd799439070",
-    "title": "Monday Special",
-    "slug": "monday-special",
-    "description": "50% off on all biryani",
+    "name": "Chef's Truffle Risotto",
+    "slug": "chefs-truffle-risotto",
+    "description": "Seasonal truffle risotto, chef's special",
     "image": {
       "url": "https://res.cloudinary.com/...",
-      "imageId": "daily-specials/monday_xyz"
+      "imageId": "daily-specials/truffle_risotto_xyz"
     },
-    "discountPercentage": 50,
-    "validFrom": "2024-01-22T00:00:00.000Z",
-    "validUntil": "2024-01-22T23:59:59.000Z",
-    "isActive": true
+    "variants": [
+      {
+        "_id": "607f1f77bcf86cd799439071",
+        "label": "Regular",
+        "price": 450,
+        "discountedPrice": 400,
+        "points": 60,
+        "isAvailable": true
+      }
+    ],
+    "isActive": true,
+    "startDate": "2024-01-22T00:00:00.000Z",
+    "endDate": "2024-01-22T23:59:59.000Z"
   }
 ]
 ```
@@ -1801,7 +1976,7 @@ variants: '[
 **Endpoint:** `GET /daily-specials/:slug`  
 **Auth:** Public
 
-**Response (200 OK):** Single daily special object
+**Response (200 OK):** Single daily special object (same shape as above, unfiltered variants)
 
 ---
 
@@ -1809,7 +1984,7 @@ variants: '[
 **Endpoint:** `GET /daily-specials`  
 **Auth:** Required (Admin)
 
-**Response (200 OK):** Array of all daily specials
+**Response (200 OK):** Array of all daily specials (active and inactive)
 
 ---
 
@@ -1820,24 +1995,34 @@ variants: '[
 
 **Request Body (Form Data):**
 ```
-title: "Tuesday Special"
-description: "Buy 1 Get 1 on selected items"
-discountPercentage: 50
-validFrom: "2024-01-23T00:00:00.000Z"
-validUntil: "2024-01-23T23:59:59.000Z"
-image: <File>
-isActive: true
+name: "Chef's Truffle Risotto"
+description: "Seasonal truffle risotto, chef's special"
+variants: '[
+  { "label": "Regular", "price": 450, "discountedPrice": 400, "points": 60, "isAvailable": true }
+]'
+startDate: "2024-01-23T00:00:00.000Z"
+endDate: "2024-01-23T23:59:59.000Z"
+image: <File> (required)
 ```
+`variants` is a JSON-stringified array (same shape as Food variants). New specials are always created with `isActive: false` — activate explicitly via Update.
 
-**Response (201 Created):** Daily special object
+**Response (201 Created):** Daily special object (same shape as Get by Slug)
+
+**Error Response:**
+```json
+{ "message": "Image is required" }
+```
 
 ---
 
 ### 5. Update Daily Special (Admin)
 **Endpoint:** `PUT /daily-specials/:id`  
-**Auth:** Required (Admin)
+**Auth:** Required (Admin)  
+**Multipart:** Form Data
 
-**Response (200 OK):** Updated daily special
+**Request Body:** Any subset of `name`, `description`, `variants` (JSON string), `startDate`, `endDate`, `isActive`, `image` (file). Setting `isActive: true` automatically deactivates every other daily special.
+
+**Response (200 OK):** Updated daily special object
 
 ---
 
@@ -1848,8 +2033,7 @@ isActive: true
 **Response (200 OK):**
 ```json
 {
-  "success": true,
-  "message": "Daily special deleted"
+  "message": "Deleted successfully"
 }
 ```
 
@@ -2325,6 +2509,53 @@ image: <File>
 }
 ```
 
+### DailySpecial Model
+```json
+{
+  "_id": ObjectId,
+  "name": String,
+  "slug": String (unique),
+  "description": String,
+  "image": {
+    "url": String,
+    "imageId": String
+  },
+  "variants": [
+    {
+      "_id": ObjectId,
+      "label": String,
+      "price": Number,
+      "discountedPrice": Number,
+      "points": Number,
+      "isAvailable": Boolean
+    }
+  ],
+  "isActive": Boolean,
+  "startDate": Date,
+  "endDate": Date,
+  "createdAt": Date,
+  "updatedAt": Date
+}
+```
+Mirrors the `Food` model's variant-based pricing. Only one `DailySpecial` may have `isActive: true` at a time (enforced in `updateDailySpecial`).
+
+### Lead Model
+```json
+{
+  "_id": ObjectId,
+  "clientName": String,
+  "organization": String,
+  "address": String,
+  "phoneNumber": String,
+  "rider": ObjectId (ref: User),
+  "riderName": String,
+  "status": "New" | "Contacted" | "Converted" | "Rejected" (default: "New"),
+  "createdAt": Date,
+  "updatedAt": Date
+}
+```
+Submitted by riders (`POST /rider/leads`) as sales leads for potential corporate/bulk clients. `riderName` is a snapshot of the submitting rider's `fullName`, used as a display fallback if that rider's account is later deleted.
+
 ### Order Model
 ```json
 {
@@ -2333,7 +2564,8 @@ image: <File>
   "orderId": String (unique),
   "items": [
     {
-      "foodItem": ObjectId (ref: Food),
+      "itemType": "Food" | "DailySpecial" (default: "Food"),
+      "foodItem": ObjectId (refPath: items.itemType — Food or DailySpecial),
       "name": String,
       "quantity": Number,
       "priceAtPurchase": Number,
@@ -2358,7 +2590,8 @@ image: <File>
     "lng": Number
   },
   "distance": Number,
-  "rider": ObjectId (ref: User),
+  "rider": ObjectId (ref: User, null if unassigned),
+  "riderName": String,
   "assignedAt": Date,
   "deliveredAt": Date,
   "requestedDeliveryTime": Date,
@@ -2368,6 +2601,8 @@ image: <File>
   "updatedAt": Date
 }
 ```
+- **Status transitions** are enforced server-side and are fixed/forward-only for admins: `Pending → Preparing | Cancelled → Ready for Delivery → [rider-managed] Out for Delivery → Delivered`. See [Update Order Status (Admin)](#7-update-order-status-admin).
+- `riderName` is a point-in-time snapshot of the assigned rider's `fullName`, set when the rider accepts the order (`PUT /rider/orders/:id/accept`). It stays valid even if the rider's `User` account is later deleted — use it as the display fallback whenever `rider` is `null`/unpopulated.
 
 ### Cart Model
 ```json
@@ -2377,11 +2612,14 @@ image: <File>
   "items": [
     {
       "_id": ObjectId,
-      "foodItem": ObjectId (ref: Food),
-      "variantId": ObjectId,
+      "itemType": "Food" | "DailySpecial" (default: "Food"),
+      "foodItem": ObjectId (refPath: items.itemType — Food or DailySpecial),
+      "variantId": String,
       "quantity": Number
     }
   ],
+  "appliedPromo": String,
+  "appliedReward": ObjectId (ref: Reward),
   "createdAt": Date,
   "updatedAt": Date
 }

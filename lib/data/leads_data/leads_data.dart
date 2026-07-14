@@ -1,4 +1,4 @@
-import 'package:rider/models/leeds_models.dart/info_models.dart';
+import 'package:rider/models/leeds_models/info_models.dart';
 
 final List<InfoModels> sampleLeads = [
   InfoModels(

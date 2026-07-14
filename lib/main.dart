@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rider/screen/pool_screen.dart';
+import 'package:rider/auth/login_scree.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
-      child: MaterialApp(debugShowCheckedModeBanner: false, home: PoolScreen()),
+      child: MaterialApp(debugShowCheckedModeBanner: false, home: LoginScree()),
     );
   }
 }
