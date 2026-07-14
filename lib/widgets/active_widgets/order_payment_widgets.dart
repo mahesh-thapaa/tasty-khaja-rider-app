@@ -6,15 +6,24 @@ import 'package:rider/models/active_models/order_active_models.dart';
 
 class OrderPaymentWidgets extends StatefulWidget {
   final OrderActiveModels order;
+  final bool isPaid;
+  final ValueChanged<String>? onMarkPaid;
+  final VoidCallback? onMarkDelivered;
 
-  const OrderPaymentWidgets({super.key, required this.order});
+  const OrderPaymentWidgets({
+    super.key,
+    required this.order,
+    required this.isPaid,
+    this.onMarkPaid,
+    this.onMarkDelivered,
+  });
 
   @override
   State<OrderPaymentWidgets> createState() => _OrderPaymentWidgetsState();
 }
 
 class _OrderPaymentWidgetsState extends State<OrderPaymentWidgets> {
-  String selectedMethod = 'CASH';
+  String selectedMethod = 'COD';
 
   @override
   Widget build(BuildContext context) {
@@ -210,71 +219,75 @@ class _OrderPaymentWidgetsState extends State<OrderPaymentWidgets> {
                 ),
               ),
 
-              SizedBox(height: 16.h),
+              if (!widget.isPaid) ...[
+                SizedBox(height: 16.h),
 
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: AppColors.navBarColor.withValues(alpha: 0.1),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(
+                      color: AppColors.navBarColor.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'SELECT PAYMENT METHOD',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.navBarColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        children: [
+                          Expanded(child: _buildPaymentButton('COD')),
+                          SizedBox(width: 12.w),
+                          Expanded(child: _buildPaymentButton('Online')),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'SELECT PAYMENT METHOD',
-                      style: TextStyle(
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.navBarColor,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    Row(
-                      children: [
-                        Expanded(child: _buildPaymentButton('CASH')),
-                        SizedBox(width: 12.w),
-                        Expanded(child: _buildPaymentButton('ONLINE')),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ],
           ),
           SizedBox(height: 12.h),
 
           Row(
             children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.paidColor,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+              if (!widget.isPaid) ...[
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => widget.onMarkPaid?.call(selectedMethod),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.paidColor,
+                      foregroundColor: AppColors.textColor,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 10.h),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 10.h),
-                  ),
-                  child: Text(
-                    'Mark Paid',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
+                    child: Text(
+                      'Mark Paid',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(width: 16.w),
+                SizedBox(width: 16.w),
+              ],
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: widget.onMarkDelivered,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
                     foregroundColor: AppColors.textColor,
@@ -302,7 +315,7 @@ class _OrderPaymentWidgetsState extends State<OrderPaymentWidgets> {
 
   Widget _buildPaymentButton(String method) {
     final isSelected = selectedMethod == method;
-    final Color selectedColor = method == 'ONLINE'
+    final Color selectedColor = method == 'Online'
         ? AppColors.leadsColor
         : AppColors.primaryColor;
 
@@ -321,7 +334,7 @@ class _OrderPaymentWidgetsState extends State<OrderPaymentWidgets> {
           ),
         ),
         child: Text(
-          method,
+          method == 'COD' ? 'CASH' : method.toUpperCase(),
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.navBarColor,
             fontWeight: FontWeight.bold,

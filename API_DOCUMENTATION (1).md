@@ -1821,7 +1821,55 @@ Fails with `400` if changing `email` collides with an existing user's email.
     "_id": "507f1f77bcf86cd799439020",
     "paymentStatus": "Paid"
   }
-}
+}I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1214847293, downTime=1214847293, phoneEventTime=16:48:12.394 } moveCount:0
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1214847388, downTime=1214847293, phoneEventTime=16:48:12.488 } moveCount:0
+W/WindowOnBackDispatcher(15555): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(15555): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+I/flutter (15555):   [flutter_map]
+I/flutter (15555):     We want to help keep OpenStreetMap available for everyone. Our examples
+I/flutter (15555):     and demo app use the public tile servers, but they are NOT free to use by
+I/flutter (15555):     everyone! Please review whether the OpenStreetMap tile servers are suitable
+I/flutter (15555):     for your project.
+I/flutter (15555):     See:
+I/flutter (15555):       * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+I/flutter (15555):       * https://docs.fleaflet.dev/osm-warn for more information about this warning
+I/flutter (15555):   [flutter_map]
+I/flutter (15555):     We want to help keep OpenStreetMap available for everyone. Our examples
+I/flutter (15555):     and demo app use the public tile servers, but they are NOT free to use by
+I/flutter (15555):     everyone! Please review whether the OpenStreetMap tile servers are suitable
+I/flutter (15555):     for your project.
+I/flutter (15555):     See:
+I/flutter (15555):       * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+I/flutter (15555):       * https://docs.fleaflet.dev/osm-warn for more information about this warning
+I/flutter (15555):   [flutter_map]
+I/flutter (15555):     We want to help keep OpenStreetMap available for everyone. Our examples
+I/flutter (15555):     and demo app use the public tile servers, but they are NOT free to use by
+I/flutter (15555):     everyone! Please review whether the OpenStreetMap tile servers are suitable
+I/flutter (15555):     for your project.
+I/flutter (15555):     See:
+I/flutter (15555):       * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+I/flutter (15555):       * https://docs.fleaflet.dev/osm-warn for more information about this warning
+I/flutter (15555):   [flutter_map]
+I/flutter (15555):     We want to help keep OpenStreetMap available for everyone. Our examples
+I/flutter (15555):     and demo app use the public tile servers, but they are NOT free to use by
+I/flutter (15555):     everyone! Please review whether the OpenStreetMap tile servers are suitable
+I/flutter (15555):     for your project.
+I/flutter (15555):     See:
+I/flutter (15555):       * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+I/flutter (15555):       * https://docs.fleaflet.dev/osm-warn for more information about this warning
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1214853198, downTime=1214853198, phoneEventTime=16:48:18.298 } moveCount:0
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1214853300, downTime=1214853198, phoneEventTime=16:48:18.400 } moveCount:0
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1214853984, downTime=1214853984, phoneEventTime=16:48:19.084 } moveCount:0
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1214854089, downTime=1214853984, phoneEventTime=16:48:19.190 } moveCount:0
+I/flutter (15555): Mark Paid error: Order validation failed: paymentMethod: `cash` is not a valid enum value for path `paymentMethod`.
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1214869535, downTime=1214869535, phoneEventTime=16:48:34.636 } moveCount:0
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1214869603, downTime=1214869535, phoneEventTime=16:48:34.704 } moveCount:0
+I/flutter (15555): Mark Paid error: Order validation failed: paymentMethod: `cash` is not a valid enum value for path `paymentMethod`.
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1214888685, downTime=1214888685, phoneEventTime=16:48:53.786 } moveCount:0
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1214888792, downTime=1214888685, phoneEventTime=16:48:53.892 } moveCount:0
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1214889445, downTime=1214889445, phoneEventTime=16:48:54.546 } moveCount:0
+I/MIUIInput(15555): [MotionEvent] ViewRootImpl windowName 'com.example.rider/com.example.rider.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1214889554, downTime=1214889445, phoneEventTime=16:48:54.654 } moveCount:0
+I/flutter (15555): Mark Paid error: Order validation failed: paymentMethod: `online` is not a valid enum value for path `paymentMethod`.
 ```
 
 ---

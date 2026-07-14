@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// Your existing imports
 import 'package:rider/components/top_bar_components/top_bar.dart';
 import 'package:rider/const/app_colors.dart';
 import 'package:rider/models/active_models/order_active_models.dart';
 import 'package:rider/screen/button_nav_bar.dart';
 import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/services/orders/active_services.dart';
+import 'package:rider/services/orders/mark_paid_services.dart';
 import 'package:rider/widgets/active_widgets/empty_active_widgets.dart';
 import 'package:rider/widgets/active_widgets/order_payment_widgets.dart';
 
@@ -20,14 +20,45 @@ class ActiveScreens extends StatefulWidget {
 
 class _ActiveScreensState extends State<ActiveScreens> {
   final ActiveService _activeService = ActiveService();
+  final MarkPaidService _markPaidService = MarkPaidService();
   List<OrderActiveModels> _active = [];
   bool _isLoading = true;
   String? _errorMessage;
+  final Set<String> _paidOrderIds = {};
 
   @override
   void initState() {
     super.initState();
     _fetchOrders();
+  }
+
+  Future<void> _markPaid(OrderActiveModels order, String paymentMethod) async {
+    try {
+      await _markPaidService.markOrderPaid(
+        order.mongoId,
+        paymentMethod: paymentMethod,
+      );
+      if (!mounted) return;
+      setState(() {
+        _paidOrderIds.add(order.mongoId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Payment received'),
+          backgroundColor: AppColors.activeColor,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: AppColors.primaryColor,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   Future<void> _fetchOrders() async {
@@ -66,8 +97,10 @@ class _ActiveScreensState extends State<ActiveScreens> {
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 5.h,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -107,8 +140,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
         height: 200.h,
         child: const Center(
           child: CircularProgressIndicator(
-            valueColor:
-                AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
           ),
         ),
       );
@@ -123,7 +155,10 @@ class _ActiveScreensState extends State<ActiveScreens> {
             children: [
               Text(
                 _errorMessage!,
-                style: TextStyle(color: Colors.red, fontSize: 13.sp),
+                style: TextStyle(
+                  color: AppColors.primaryColor,
+                  fontSize: 13.sp,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 10.h),
@@ -156,7 +191,11 @@ class _ActiveScreensState extends State<ActiveScreens> {
         final order = _active[index];
         return Padding(
           padding: EdgeInsets.only(bottom: 16.h),
-          child: OrderPaymentWidgets(order: order),
+          child: OrderPaymentWidgets(
+            order: order,
+            isPaid: _paidOrderIds.contains(order.mongoId),
+            onMarkPaid: (method) => _markPaid(order, method),
+          ),
         );
       },
     );

@@ -3,6 +3,7 @@ import 'package:rider/models/pool_models/order_models.dart';
 
 class OrderActiveModels {
   final String id;
+  final String mongoId;
   final String paymentMethod;
   final String deliveryLocationName;
   final Coordinates coordinates;
@@ -14,6 +15,7 @@ class OrderActiveModels {
 
   OrderActiveModels({
     required this.id,
+    required this.mongoId,
     required this.paymentMethod,
     required this.deliveryLocationName,
     required this.coordinates,
@@ -48,6 +50,7 @@ class OrderActiveModels {
 
     return OrderActiveModels(
       id: json['orderId'] ?? json['_id'] ?? '',
+      mongoId: json['_id'] ?? '',
       paymentMethod: json['paymentMethod'] ?? 'COD',
       deliveryLocationName: fullAddress,
       coordinates: Coordinates.fromJson(json['userLocation'] ?? {}),
