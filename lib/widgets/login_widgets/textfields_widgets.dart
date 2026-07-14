@@ -26,12 +26,11 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      final loginData = LoginModels(
+      final request = LoginModels(
         email: _emailController.text.trim(),
-        password: _passwordController.text,
+        password: _passwordController.text.trim(),
       );
-
-      widget.onSubmitted(loginData);
+      widget.onSubmitted(request);
     }
   }
 
