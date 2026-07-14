@@ -31,4 +31,31 @@ class OrderActiveModels {
   double get total {
     return subtotal + deliveryCharge;
   }
+
+  factory OrderActiveModels.fromJson(Map<String, dynamic> json) {
+    final address = json['deliveryAddress'] ?? {};
+    final addressLine = address['addressLine'] ?? '';
+    final city = address['city'] ?? '';
+    final fullAddress = addressLine.isNotEmpty && city.isNotEmpty
+        ? '$addressLine, $city'
+        : (addressLine.isNotEmpty ? addressLine : city);
+
+    final user = json['user'] ?? {};
+
+    final parsedItems = (json['items'] as List? ?? [])
+        .map((item) => OrderItem.fromJson(item))
+        .toList();
+
+    return OrderActiveModels(
+      id: json['orderId'] ?? json['_id'] ?? '',
+      paymentMethod: json['paymentMethod'] ?? 'COD',
+      deliveryLocationName: fullAddress,
+      coordinates: Coordinates.fromJson(json['userLocation'] ?? {}),
+      distance: '${json['distance'] ?? 0.0} km',
+      items: parsedItems,
+      deliveryCharge: (json['deliveryCharge'] as num?)?.toDouble() ?? 0.0,
+      customerName: user['fullName'] ?? '',
+      customerPhone: user['phone'] ?? '',
+    );
+  }
 }

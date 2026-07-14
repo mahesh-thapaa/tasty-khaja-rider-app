@@ -5,7 +5,7 @@ import 'package:rider/models/pool_models/order_models.dart';
 import 'package:rider/screen/button_nav_bar.dart';
 import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/components/top_bar_components/top_bar.dart';
-import 'package:rider/services/orders/order_services.dart';
+import 'package:rider/services/orders/pool_services.dart';
 import 'package:rider/widgets/pool_widgets/empty_pool_widgets.dart';
 import 'package:rider/widgets/pool_widgets/order_cart_widgets.dart';
 
@@ -17,7 +17,7 @@ class PoolScreen extends StatefulWidget {
 }
 
 class _PoolScreenState extends State<PoolScreen> {
-  final OrderService _orderService = OrderService();
+  final PoolServices _poolServices = PoolServices();
   List<Order> _activeOrders = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -35,7 +35,7 @@ class _PoolScreenState extends State<PoolScreen> {
     });
 
     try {
-      final orders = await _orderService.getAvailableOrders();
+      final orders = await _poolServices.getAvailableOrders();
       setState(() {
         _activeOrders = orders;
         _isLoading = false;

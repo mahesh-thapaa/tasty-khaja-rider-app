@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:rider/models/pool_models/order_models.dart';
 import 'package:rider/services/core/api_client.dart';
 
-class OrderService {
+class PoolServices {
   final ApiClient _apiClient = ApiClient();
 
   Future<List<Order>> getAvailableOrders() async {

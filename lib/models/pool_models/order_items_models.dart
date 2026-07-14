@@ -13,7 +13,9 @@ class OrderItem {
     return OrderItem(
       name: json['name'] ?? '',
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      price: (json['price'] as num?)?.toDouble() ??
+          (json['priceAtPurchase'] as num?)?.toDouble() ??
+          0.0,
     );
   }
 }
