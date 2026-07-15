@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rider/auth/login_scree.dart';
 import 'package:rider/const/app_colors.dart';
 import 'package:rider/data/profile_data/profile_data.dart';
 import 'package:rider/screen/button_nav_bar.dart';
@@ -7,9 +8,46 @@ import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/components/top_bar_components/top_bar.dart';
 import 'package:rider/widgets/profile_widgets/personal_info.dart';
 import 'package:rider/widgets/profile_widgets/profile_section.dart';
+import 'package:rider/services/auth/logout_services.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final LogoutServices _logoutServices = LogoutServices();
+  bool _isLoggingOut = false;
+
+  Future<void> _handleLogout() async {
+    setState(() => _isLoggingOut = true);
+    try {
+      await _logoutServices.logout();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Logged out successfully'),
+          backgroundColor: AppColors.paidColor,
+        ),
+      );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScree()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoggingOut = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: AppColors.primaryColor,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +65,7 @@ class ProfileScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: InkWell(
-              onTap: () {},
+              onTap: _isLoggingOut ? null : _handleLogout,
               borderRadius: BorderRadius.circular(16.r),
               child: Container(
                 width: double.infinity,

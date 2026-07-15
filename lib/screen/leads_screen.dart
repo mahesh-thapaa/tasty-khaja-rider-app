@@ -33,6 +33,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
   }
 
   Future<void> _fetchLeads() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _error = null;
@@ -61,20 +62,21 @@ class _LeadsScreenState extends State<LeadsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Lead created successfully'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.paidColor,
         ),
       );
       setState(() {
         _isFormVisible = false;
         _isSubmitting = false;
       });
+      if (!mounted) return;
       _fetchLeads();
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.primaryColor,
         ),
       );
       setState(() => _isSubmitting = false);
@@ -133,7 +135,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                         ),
                         style: IconButton.styleFrom(
                           backgroundColor: _isFormVisible
-                              ?  AppColors.primaryColor.withValues(alpha: 0.5)
+                              ? AppColors.primaryColor.withValues(alpha: 0.5)
                               : AppColors.primaryColor,
                           minimumSize: Size(38.w, 38.w),
                           padding: EdgeInsets.zero,
@@ -158,9 +160,20 @@ class _LeadsScreenState extends State<LeadsScreen> {
                     Center(
                       child: Column(
                         children: [
-                          Text(_error!, style: const TextStyle(color: Colors.red)),
+                          Text(
+                            _error!,
+                            style: const TextStyle(
+                              color: AppColors.shadowColor,
+                            ),
+                          ),
                           SizedBox(height: 8.h),
-                          TextButton(onPressed: _fetchLeads, child: const Text('Retry')),
+                          TextButton(
+                            onPressed: _fetchLeads,
+                            child: const Text(
+                              'Retry',
+                              style: TextStyle(color: AppColors.primaryColor),
+                            ),
+                          ),
                         ],
                       ),
                     )

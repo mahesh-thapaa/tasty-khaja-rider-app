@@ -47,7 +47,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Payment received'),
-          backgroundColor: AppColors.activeColor,
+          backgroundColor: AppColors.paidColor,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -70,7 +70,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Order delivered'),
-          backgroundColor: AppColors.activeColor,
+          backgroundColor: AppColors.paidColor,
           behavior: SnackBarBehavior.floating,
         ),
       );

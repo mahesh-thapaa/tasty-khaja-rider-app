@@ -34,7 +34,12 @@ class _LoginScreeState extends State<LoginScree> {
       });
 
       if (response != null && mounted) {
-        // Successful login, navigate to PoolScreen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Logged in successfully'),
+            backgroundColor: AppColors.paidColor,
+          ),
+        );
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
@@ -51,14 +56,14 @@ class _LoginScreeState extends State<LoginScree> {
       setState(() {
         _isLoading = false;
       });
-      // Displays the specific backend error (e.g. "Account is blocked" or "Invalid credentials")
+
       _showError(error.toString().replaceAll('Exception: ', ''));
     }
   }
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
+      SnackBar(content: Text(message), backgroundColor: AppColors.primaryColor),
     );
   }
 
@@ -112,7 +117,6 @@ class _LoginScreeState extends State<LoginScree> {
                         ),
                         SizedBox(height: 2.h),
 
-                        // Connected to our active login function!
                         TextfieldsWidgets(onSubmitted: _onLoginSubmitted),
                       ],
                     ),

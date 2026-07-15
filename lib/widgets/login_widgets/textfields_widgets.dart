@@ -67,7 +67,6 @@ class _LoginFieldsContainerState extends State<TextfieldsWidgets> {
           ),
           const SizedBox(height: 20.0),
 
-          // --- Password Text Field ---
           const Text(
             'Password',
             style: TextStyle(

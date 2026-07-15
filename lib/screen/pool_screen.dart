@@ -57,7 +57,7 @@ class _PoolScreenState extends State<PoolScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Order accepted!'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.paidColor,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -67,7 +67,7 @@ class _PoolScreenState extends State<PoolScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: Colors.redAccent,
+          backgroundColor: AppColors.primaryColor,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -147,7 +147,10 @@ class _PoolScreenState extends State<PoolScreen> {
             children: [
               Text(
                 _errorMessage!,
-                style: TextStyle(color: Colors.red, fontSize: 13.sp),
+                style: TextStyle(
+                  color: AppColors.primaryColor,
+                  fontSize: 13.sp,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 10.h),
