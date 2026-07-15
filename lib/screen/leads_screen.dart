@@ -5,7 +5,8 @@ import 'package:rider/const/app_colors.dart';
 import 'package:rider/data/leads_data/leads_data.dart';
 import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/screen/button_nav_bar.dart';
-import 'package:rider/widgets/leeds_widget.dart/info_widgets.dart'; // Adjust path
+import 'package:rider/services/leads/lead_service.dart';
+import 'package:rider/widgets/leeds_widget.dart/info_widgets.dart';
 import 'package:rider/widgets/leeds_widget.dart/leed_cart_widget.dart';
 
 class LeadsScreen extends StatefulWidget {
@@ -17,6 +18,35 @@ class LeadsScreen extends StatefulWidget {
 
 class _LeadsScreenState extends State<LeadsScreen> {
   bool _isFormVisible = false;
+  bool _isSubmitting = false;
+  final LeadService _leadService = LeadService();
+
+  Future<void> _handleSubmit(lead) async {
+    setState(() => _isSubmitting = true);
+    try {
+      await _leadService.createLead(lead);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Lead created successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      setState(() {
+        _isFormVisible = false;
+        _isSubmitting = false;
+      });
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() => _isSubmitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +100,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                         ),
                         style: IconButton.styleFrom(
                           backgroundColor: _isFormVisible
-                              ? const Color(0xFF8F1E1E)
+                              ?  AppColors.primaryColor.withValues(alpha: 0.5)
                               : AppColors.primaryColor,
                           minimumSize: Size(38.w, 38.w),
                           padding: EdgeInsets.zero,
@@ -84,12 +114,8 @@ class _LeadsScreenState extends State<LeadsScreen> {
 
                   if (_isFormVisible) ...[
                     InfoWidgets(
-                      onSubmit: (lead) {
-                        debugPrint('Lead submitted: ${lead.name}');
-                        setState(() {
-                          _isFormVisible = false;
-                        });
-                      },
+                      onSubmit: _handleSubmit,
+                      isSubmitting: _isSubmitting,
                     ),
                     SizedBox(height: 20.h),
                   ],

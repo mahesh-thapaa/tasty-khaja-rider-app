@@ -61,7 +61,7 @@ class AddLeadDialog extends StatelessWidget {
                       child: InfoWidgets(
                         onSubmit: (lead) {
                           debugPrint(
-                            'Lead submitted: ${lead.name}, ${lead.organization}, ${lead.address}, ${lead.phoneNumber}',
+                            'Lead submitted: ${lead.clientName}, ${lead.organization}, ${lead.address}, ${lead.phoneNumber}',
                           );
                           Navigator.of(context).pop();
                         },

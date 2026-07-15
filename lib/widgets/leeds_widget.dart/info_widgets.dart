@@ -5,8 +5,9 @@ import 'package:rider/models/leeds_models/info_models.dart';
 
 class InfoWidgets extends StatefulWidget {
   final void Function(InfoModels lead)? onSubmit;
+  final bool isSubmitting;
 
-  const InfoWidgets({super.key, this.onSubmit});
+  const InfoWidgets({super.key, this.onSubmit, this.isSubmitting = false});
 
   @override
   State<InfoWidgets> createState() => _InfoWidgetsState();
@@ -30,10 +31,11 @@ class _InfoWidgetsState extends State<InfoWidgets> {
   }
 
   void _submitLead() {
+    if (widget.isSubmitting) return;
     if (!_formKey.currentState!.validate()) return;
 
     final lead = InfoModels(
-      name: nameController.text.trim(),
+      clientName: nameController.text.trim(),
       organization: organizationController.text.trim(),
       address: addressController.text.trim(),
       phoneNumber: phoneController.text.trim(),
@@ -178,20 +180,31 @@ class _InfoWidgetsState extends State<InfoWidgets> {
               child: ElevatedButton(
                 onPressed: _submitLead,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8F1E1E),
+                  backgroundColor: widget.isSubmitting
+                      ? const Color(0xFF8F1E1E).withValues(alpha: 0.5)
+                      : const Color(0xFF8F1E1E),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14.r),
                   ),
                   elevation: 0,
                 ),
-                child: Text(
-                  'Submit Lead',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: widget.isSubmitting
+                    ? SizedBox(
+                        width: 20.w,
+                        height: 20.w,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'Submit Lead',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ],

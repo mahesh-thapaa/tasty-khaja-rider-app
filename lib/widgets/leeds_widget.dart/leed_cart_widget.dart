@@ -52,7 +52,7 @@ class LeadItemCard extends StatelessWidget {
                   ),
                   SizedBox(width: 4.w),
                   Text(
-                    lead.date,
+                    lead.createdAt ?? '',
                     style: TextStyle(
                       color: AppColors.navBarColor.withValues(alpha: 0.7),
                       fontSize: 11.sp,
@@ -67,7 +67,7 @@ class LeadItemCard extends StatelessWidget {
           SizedBox(height: 8.h),
 
           Text(
-            lead.name,
+            lead.clientName,
             style: TextStyle(
               color: AppColors.shadowColor,
               fontSize: 15.sp,
@@ -86,7 +86,7 @@ class LeadItemCard extends StatelessWidget {
               ),
               SizedBox(width: 8.w),
               Text(
-                lead.organization,
+                lead.organization ?? '',
                 style: TextStyle(
                   color: AppColors.navBarColor.withValues(alpha: 0.7),
                   fontSize: 11.sp,

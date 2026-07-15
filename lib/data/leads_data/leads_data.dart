@@ -2,19 +2,19 @@ import 'package:rider/models/leeds_models/info_models.dart';
 
 final List<InfoModels> sampleLeads = [
   InfoModels(
-    name: "Hari Acharya",
+    clientName: "Hari Acharya",
     organization: "Midtown Cinemas",
     address: "Sabhagriha Chowk",
     phoneNumber: "9812345678",
-    date: "7/13/2026",
+    createdAt: "2024-01-21T17:00:00.000Z",
     status: "NEW",
   ),
   InfoModels(
-    name: "John Doe",
+    clientName: "John Doe",
     organization: "Lumino Technology",
     address: "E.g. 123 Main St, New Baneshwor",
     phoneNumber: "9876543210",
-    date: "7/10/2026",
+    createdAt: "2024-01-18T10:30:00.000Z",
     status: "NEW",
   ),
 ];
