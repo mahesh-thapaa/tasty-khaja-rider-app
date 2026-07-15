@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rider/services/core/api_client.dart';
 
 class MarkDeliveredService {
@@ -19,7 +20,7 @@ class MarkDeliveredService {
     } on DioException catch (e) {
       final errorMessage =
           e.response?.data['message'] ?? 'Failed to mark as delivered';
-      print("Mark Delivered error: $errorMessage");
+      debugPrint("Mark Delivered error: $errorMessage");
       throw Exception(errorMessage);
     }
   }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rider/services/core/api_client.dart';
 
 class AcceptOrderService {
@@ -17,7 +18,7 @@ class AcceptOrderService {
     } on DioException catch (e) {
       final errorMessage =
           e.response?.data['message'] ?? 'Failed to accept order';
-      print("Accept Order error: $errorMessage");
+      debugPrint("Accept Order error: $errorMessage");
       throw Exception(errorMessage);
     }
   }

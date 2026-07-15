@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rider/models/active_models/order_active_models.dart';
 import 'package:rider/services/core/api_client.dart';
 
@@ -35,7 +36,7 @@ class ActiveService {
     } on DioException catch (e) {
       final errorMessage =
           e.response?.data['message'] ?? 'Failed to load my orders';
-      print("Fetch My Orders error: $errorMessage");
+      debugPrint("Fetch My Orders error: $errorMessage");
       throw Exception(errorMessage);
     }
   }

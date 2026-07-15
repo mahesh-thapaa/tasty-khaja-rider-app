@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rider/services/core/api_client.dart';
 
 class MarkPaidService {
@@ -20,7 +21,7 @@ class MarkPaidService {
     } on DioException catch (e) {
       final errorMessage =
           e.response?.data['message'] ?? 'Failed to mark as paid';
-      print("Mark Paid error: $errorMessage");
+      debugPrint("Mark Paid error: $errorMessage");
       throw Exception(errorMessage);
     }
   }

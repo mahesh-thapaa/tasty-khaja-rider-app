@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rider/services/core/api_client.dart';
 
 class RiderLogin {
@@ -9,10 +10,10 @@ class RiderLogin {
       final response = await _apiClient.dio.get('/riders/orders');
 
       if (response.statusCode == 200) {
-        print("Orders fetched successfully: ${response.data}");
+        debugPrint("Orders fetched successfully: ${response.data}");
       }
     } on DioException catch (e) {
-      print("Error fetching orders: ${e.message}");
+      debugPrint("Error fetching orders: ${e.message}");
     }
   }
 }
