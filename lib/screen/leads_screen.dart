@@ -63,6 +63,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
         SnackBar(
           content: const Text('Lead created successfully'),
           backgroundColor: AppColors.paidColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
       setState(() {
@@ -77,6 +78,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
         SnackBar(
           content: Text(e.toString().replaceFirst('Exception: ', '')),
           backgroundColor: AppColors.primaryColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
       setState(() => _isSubmitting = false);

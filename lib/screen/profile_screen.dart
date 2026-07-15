@@ -27,9 +27,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _logoutServices.logout();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Logged out successfully'),
+        SnackBar(
+          content: const Text('Logged out successfully'),
           backgroundColor: AppColors.paidColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
       Navigator.pushAndRemoveUntil(
@@ -44,6 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SnackBar(
           content: Text(e.toString().replaceFirst('Exception: ', '')),
           backgroundColor: AppColors.primaryColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
     }

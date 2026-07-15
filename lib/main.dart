@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:rider/auth/login_scree.dart';
 import 'package:rider/screen/pool_screen.dart';
+import 'package:rider/services/core/api_client.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  const securestorage = FlutterSecureStorage();
-  final String? token = await securestorage.read(key: 'rider_auth_token');
+
+  ApiClient.onUnauthorized = () {
+    navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScree()),
+      (route) => false,
+    );
+  };
+
+  final String? token = await ApiClient.secureStorage.read(key: 'rider_auth_token');
   runApp(MyApp(isLoggedIn: token != null));
 }
 
@@ -23,6 +32,7 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         home: isLoggedIn ? const PoolScreen() : const LoginScree(),
       ),

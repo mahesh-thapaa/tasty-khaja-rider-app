@@ -59,6 +59,7 @@ class _PoolScreenState extends State<PoolScreen> {
           content: const Text('Order accepted!'),
           backgroundColor: AppColors.paidColor,
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
       _fetchOrders();
@@ -69,6 +70,7 @@ class _PoolScreenState extends State<PoolScreen> {
           content: Text(e.toString().replaceFirst('Exception: ', '')),
           backgroundColor: AppColors.primaryColor,
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
     }

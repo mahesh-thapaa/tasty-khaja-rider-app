@@ -49,6 +49,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
           content: const Text('Payment received'),
           backgroundColor: AppColors.paidColor,
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
     } catch (e) {
@@ -58,6 +59,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
           content: Text(e.toString().replaceFirst('Exception: ', '')),
           backgroundColor: AppColors.primaryColor,
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
     }
@@ -72,6 +74,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
           content: const Text('Order delivered'),
           backgroundColor: AppColors.paidColor,
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
       setState(() {
@@ -84,6 +87,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
           content: Text(e.toString().replaceFirst('Exception: ', '')),
           backgroundColor: AppColors.primaryColor,
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
     }

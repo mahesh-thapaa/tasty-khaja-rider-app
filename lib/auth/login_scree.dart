@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rider/const/app_colors.dart';
 import 'package:rider/models/login_models/login_models.dart';
 import 'package:rider/models/login_models/login_request_models.dart';
+import 'package:rider/screen/pool_screen.dart';
 import 'package:rider/services/core/auth_services.dart';
 import 'package:rider/widgets/login_widgets/textfields_widgets.dart';
-import 'package:rider/screen/pool_screen.dart';
 
 class LoginScree extends StatefulWidget {
   const LoginScree({super.key});
@@ -35,9 +35,10 @@ class _LoginScreeState extends State<LoginScree> {
 
       if (response != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Logged in successfully'),
+          SnackBar(
+            content: const Text('Logged in successfully'),
             backgroundColor: AppColors.paidColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
           ),
         );
         Navigator.pushReplacement(
@@ -63,7 +64,7 @@ class _LoginScreeState extends State<LoginScree> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: AppColors.primaryColor),
+      SnackBar(content: Text(message), backgroundColor: AppColors.primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r))),
     );
   }
 
