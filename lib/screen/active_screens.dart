@@ -3,12 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:rider/components/top_bar_components/top_bar.dart';
 import 'package:rider/const/app_colors.dart';
+import 'package:rider/controller/active_controller/active_screen_controller.dart';
 import 'package:rider/models/active_models/order_active_models.dart';
 import 'package:rider/screen/button_nav_bar.dart';
 import 'package:rider/data/pool_data/top_bar_data.dart';
-import 'package:rider/services/orders/active_services.dart';
-import 'package:rider/services/orders/mark_delivered_services.dart';
-import 'package:rider/services/orders/mark_paid_services.dart';
 import 'package:rider/widgets/active_widgets/empty_active_widgets.dart';
 import 'package:rider/widgets/active_widgets/order_payment_widgets.dart';
 
@@ -20,97 +18,48 @@ class ActiveScreens extends StatefulWidget {
 }
 
 class _ActiveScreensState extends State<ActiveScreens> {
-  final ActiveService _activeService = ActiveService();
-  final MarkPaidService _markPaidService = MarkPaidService();
-  final MarkDeliveredService _markDeliveredService = MarkDeliveredService();
-  List<OrderActiveModels> _active = [];
-  bool _isLoading = true;
-  String? _errorMessage;
-  final Set<String> _paidOrderIds = {};
+  final _controller = ActiveScreenController();
 
   @override
   void initState() {
     super.initState();
-    _fetchOrders();
+    _controller.addListener(_onChanged);
+    _controller.fetchOrders();
+  }
+
+  void _onChanged() => setState(() {});
+
+  @override
+  void dispose() {
+    _controller.removeListener(_onChanged);
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _markPaid(OrderActiveModels order, String paymentMethod) async {
-    try {
-      await _markPaidService.markOrderPaid(
-        order.mongoId,
-        paymentMethod: paymentMethod,
-      );
-      if (!mounted) return;
-      setState(() {
-        _paidOrderIds.add(order.mongoId);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Payment received'),
-          backgroundColor: AppColors.paidColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: AppColors.primaryColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        ),
-      );
-    }
+    final error = await _controller.markPaid(order, paymentMethod);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error ?? 'Payment received'),
+        backgroundColor: error != null ? AppColors.primaryColor : AppColors.paidColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      ),
+    );
   }
 
   Future<void> _markDelivered(OrderActiveModels order) async {
-    try {
-      await _markDeliveredService.markOrderDelivered(order.mongoId);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Order delivered'),
-          backgroundColor: AppColors.paidColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        ),
-      );
-      setState(() {
-        _active.removeWhere((o) => o.mongoId == order.mongoId);
-      });
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: AppColors.primaryColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        ),
-      );
-    }
-  }
-
-  Future<void> _fetchOrders() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final orders = await _activeService.getMyOrders();
-      setState(() {
-        _active = orders;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString().replaceFirst('Exception: ', '');
-        _isLoading = false;
-      });
-    }
+    final error = await _controller.markDelivered(order);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error ?? 'Order delivered'),
+        backgroundColor: error != null ? AppColors.primaryColor : AppColors.paidColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      ),
+    );
   }
 
   @override
@@ -124,7 +73,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
 
           Expanded(
             child: RefreshIndicator(
-              onRefresh: _fetchOrders,
+              onRefresh: _controller.fetchOrders,
               color: AppColors.primaryColor,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -167,7 +116,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
   }
 
   Widget _buildBodyContent() {
-    if (_isLoading) {
+    if (_controller.isLoading) {
       return SizedBox(
         height: 200.h,
         child: const Center(
@@ -178,7 +127,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
       );
     }
 
-    if (_errorMessage != null) {
+    if (_controller.errorMessage != null) {
       return SizedBox(
         height: 200.h,
         child: Center(
@@ -186,7 +135,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _errorMessage!,
+                _controller.errorMessage!,
                 style: TextStyle(
                   color: AppColors.primaryColor,
                   fontSize: 13.sp,
@@ -195,7 +144,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
               ),
               SizedBox(height: 10.h),
               ElevatedButton(
-                onPressed: _fetchOrders,
+                onPressed: _controller.fetchOrders,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
                 ),
@@ -210,7 +159,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
       );
     }
 
-    if (_active.isEmpty) {
+    if (_controller.active.isEmpty) {
       return const EmptyActiveWidgets();
     }
 
@@ -218,14 +167,14 @@ class _ActiveScreensState extends State<ActiveScreens> {
       padding: EdgeInsets.zero,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemCount: _active.length,
+      itemCount: _controller.active.length,
       itemBuilder: (context, index) {
-        final order = _active[index];
+        final order = _controller.active[index];
         return Padding(
           padding: EdgeInsets.only(bottom: 16.h),
           child: OrderPaymentWidgets(
             order: order,
-            isPaid: _paidOrderIds.contains(order.mongoId),
+            isPaid: _controller.paidOrderIds.contains(order.mongoId),
             onMarkPaid: (method) => _markPaid(order, method),
             onMarkDelivered: () => _markDelivered(order),
           ),

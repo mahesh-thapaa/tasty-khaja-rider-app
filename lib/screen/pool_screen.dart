@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rider/const/app_colors.dart';
+import 'package:rider/controller/pool_controller/pool_screen_controller.dart';
 import 'package:rider/models/pool_models/order_models.dart';
 import 'package:rider/screen/button_nav_bar.dart';
 import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/components/top_bar_components/top_bar.dart';
-import 'package:rider/services/orders/accept_order_service.dart';
-import 'package:rider/services/orders/pool_services.dart';
 import 'package:rider/widgets/pool_widgets/empty_pool_widgets.dart';
 import 'package:rider/widgets/pool_widgets/order_cart_widgets.dart';
 
@@ -18,57 +17,41 @@ class PoolScreen extends StatefulWidget {
 }
 
 class _PoolScreenState extends State<PoolScreen> {
-  final PoolServices _poolServices = PoolServices();
-  final AcceptOrderService _acceptOrderService = AcceptOrderService();
-  List<Order> _activeOrders = [];
-  bool _isLoading = true;
-  String? _errorMessage;
+  final _controller = PoolScreenController();
 
   @override
   void initState() {
     super.initState();
-    _fetchOrders();
+    _controller.addListener(_onChanged);
+    _controller.fetchOrders();
   }
 
-  Future<void> _fetchOrders() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+  void _onChanged() => setState(() {});
 
-    try {
-      final orders = await _poolServices.getAvailableOrders();
-      setState(() {
-        _activeOrders = orders;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString().replaceFirst('Exception: ', '');
-        _isLoading = false;
-      });
-    }
+  @override
+  void dispose() {
+    _controller.removeListener(_onChanged);
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _acceptOrder(Order order) async {
-    try {
-      await _acceptOrderService.acceptOrder(order.mongoId);
-      if (!mounted) return;
+    final error = await _controller.acceptOrder(order);
+    if (!mounted) return;
+    if (error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Order accepted!'),
-          backgroundColor: AppColors.paidColor,
+          content: Text(error),
+          backgroundColor: AppColors.primaryColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
       );
-      _fetchOrders();
-    } catch (e) {
-      if (!mounted) return;
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: AppColors.primaryColor,
+          content: const Text('Order accepted!'),
+          backgroundColor: AppColors.paidColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
@@ -86,7 +69,7 @@ class _PoolScreenState extends State<PoolScreen> {
           TopBar(topBarData: topBarData),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: _fetchOrders,
+              onRefresh: _controller.fetchOrders,
               color: AppColors.primaryColor,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -129,7 +112,7 @@ class _PoolScreenState extends State<PoolScreen> {
   }
 
   Widget _buildBodyContent() {
-    if (_isLoading) {
+    if (_controller.isLoading) {
       return SizedBox(
         height: 200.h,
         child: const Center(
@@ -140,7 +123,7 @@ class _PoolScreenState extends State<PoolScreen> {
       );
     }
 
-    if (_errorMessage != null) {
+    if (_controller.errorMessage != null) {
       return SizedBox(
         height: 200.h,
         child: Center(
@@ -148,7 +131,7 @@ class _PoolScreenState extends State<PoolScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _errorMessage!,
+                _controller.errorMessage!,
                 style: TextStyle(
                   color: AppColors.primaryColor,
                   fontSize: 13.sp,
@@ -157,7 +140,7 @@ class _PoolScreenState extends State<PoolScreen> {
               ),
               SizedBox(height: 10.h),
               ElevatedButton(
-                onPressed: _fetchOrders,
+                onPressed: _controller.fetchOrders,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
                 ),
@@ -172,7 +155,7 @@ class _PoolScreenState extends State<PoolScreen> {
       );
     }
 
-    if (_activeOrders.isEmpty) {
+    if (_controller.activeOrders.isEmpty) {
       return const EmptyPoolWidgets();
     }
 
@@ -180,9 +163,9 @@ class _PoolScreenState extends State<PoolScreen> {
       padding: EdgeInsets.only(bottom: 20.h),
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemCount: _activeOrders.length,
+      itemCount: _controller.activeOrders.length,
       itemBuilder: (context, index) {
-        final order = _activeOrders[index];
+        final order = _controller.activeOrders[index];
         return Padding(
           padding: EdgeInsets.only(bottom: 16.h),
           child: OrderCardWidget(

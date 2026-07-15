@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rider/components/top_bar_components/top_bar.dart';
 import 'package:rider/const/app_colors.dart';
-import 'package:rider/data/pool_data/top_bar_data.dart';
+import 'package:rider/controller/leads_controller/leads_screen_controller.dart';
 import 'package:rider/models/leeds_models/info_models.dart';
+import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/screen/button_nav_bar.dart';
-import 'package:rider/services/leads/get_lead_services.dart';
-import 'package:rider/services/leads/lead_service.dart';
 import 'package:rider/widgets/leeds_widget.dart/info_widgets.dart';
 import 'package:rider/widgets/leeds_widget.dart/leed_cart_widget.dart';
 
@@ -18,71 +17,38 @@ class LeadsScreen extends StatefulWidget {
 }
 
 class _LeadsScreenState extends State<LeadsScreen> {
-  bool _isFormVisible = false;
-  bool _isSubmitting = false;
-  bool _isLoading = true;
-  String? _error;
-  List<InfoModels> _leads = [];
-  final LeadService _leadService = LeadService();
-  final GetLeadServices _getLeadServices = GetLeadServices();
+  final _controller = LeadsScreenController();
 
   @override
   void initState() {
     super.initState();
-    _fetchLeads();
+    _controller.addListener(_onChanged);
+    _controller.fetchLeads();
   }
 
-  Future<void> _fetchLeads() async {
+  void _onChanged() => setState(() {});
+
+  @override
+  void dispose() {
+    _controller.removeListener(_onChanged);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSubmit(InfoModels lead) async {
+    final error = await _controller.handleSubmit(lead);
     if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-    try {
-      final leads = await _getLeadServices.getLeads();
-      if (!mounted) return;
-      setState(() {
-        _leads = leads;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e.toString().replaceFirst('Exception: ', '');
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _handleSubmit(lead) async {
-    setState(() => _isSubmitting = true);
-    try {
-      await _leadService.createLead(lead);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Lead created successfully'),
-          backgroundColor: AppColors.paidColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error ?? 'Lead created successfully'),
+        backgroundColor: error != null
+            ? AppColors.primaryColor
+            : AppColors.paidColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
         ),
-      );
-      setState(() {
-        _isFormVisible = false;
-        _isSubmitting = false;
-      });
-      if (!mounted) return;
-      _fetchLeads();
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: AppColors.primaryColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        ),
-      );
-      setState(() => _isSubmitting = false);
-    }
+      ),
+    );
   }
 
   @override
@@ -125,18 +91,14 @@ class _LeadsScreenState extends State<LeadsScreen> {
                         ],
                       ),
                       IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isFormVisible = !_isFormVisible;
-                          });
-                        },
+                        onPressed: _controller.toggleForm,
                         icon: Icon(
-                          _isFormVisible ? Icons.close : Icons.add,
-                          color: Colors.white,
+                          _controller.isFormVisible ? Icons.close : Icons.add,
+                          color: AppColors.textColor,
                           size: 20.sp,
                         ),
                         style: IconButton.styleFrom(
-                          backgroundColor: _isFormVisible
+                          backgroundColor: _controller.isFormVisible
                               ? AppColors.primaryColor.withValues(alpha: 0.5)
                               : AppColors.primaryColor,
                           minimumSize: Size(38.w, 38.w),
@@ -149,28 +111,32 @@ class _LeadsScreenState extends State<LeadsScreen> {
 
                   SizedBox(height: 20.h),
 
-                  if (_isFormVisible) ...[
+                  if (_controller.isFormVisible) ...[
                     InfoWidgets(
                       onSubmit: _handleSubmit,
-                      isSubmitting: _isSubmitting,
+                      isSubmitting: _controller.isSubmitting,
                     ),
                     SizedBox(height: 20.h),
                   ],
-                  if (_isLoading)
-                    const Center(child: CircularProgressIndicator())
-                  else if (_error != null)
+                  if (_controller.isLoading)
+                    const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                      ),
+                    )
+                  else if (_controller.error != null)
                     Center(
                       child: Column(
                         children: [
                           Text(
-                            _error!,
+                            _controller.error!,
                             style: const TextStyle(
                               color: AppColors.shadowColor,
                             ),
                           ),
                           SizedBox(height: 8.h),
                           TextButton(
-                            onPressed: _fetchLeads,
+                            onPressed: _controller.fetchLeads,
                             child: const Text(
                               'Retry',
                               style: TextStyle(color: AppColors.primaryColor),
@@ -183,9 +149,9 @@ class _LeadsScreenState extends State<LeadsScreen> {
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _leads.length,
+                      itemCount: _controller.leads.length,
                       itemBuilder: (context, index) {
-                        return LeadItemCard(lead: _leads[index]);
+                        return LeadItemCard(lead: _controller.leads[index]);
                       },
                     ),
                 ],
