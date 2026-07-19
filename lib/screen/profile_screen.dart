@@ -7,7 +7,7 @@ import 'package:rider/data/profile_data/profile_data.dart';
 import 'package:rider/screen/button_nav_bar.dart';
 import 'package:rider/data/pool_data/top_bar_data.dart';
 import 'package:rider/components/top_bar_components/top_bar.dart';
-import 'package:rider/widgets/profile_widgets/deliverred_widgets/delivered_widgets.dart';
+import 'package:rider/widgets/profile_widgets/delivered_widgets/delivered_widgets.dart';
 import 'package:rider/widgets/profile_widgets/personal_info.dart';
 import 'package:rider/widgets/profile_widgets/profile_section.dart';
 
