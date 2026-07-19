@@ -11,7 +11,6 @@ class PersonalInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // width: double.infinity,
       margin: EdgeInsets.symmetric(horizontal: 20.w),
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
@@ -23,12 +22,11 @@ class PersonalInfo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Header Section
           Text(
             "PERSONAL INFORMATION",
             style: TextStyle(
               color: AppColors.navBarColor,
-              fontSize: 11.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.8,
             ),

@@ -42,9 +42,13 @@ class _ActiveScreensState extends State<ActiveScreens> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(error ?? 'Payment received'),
-        backgroundColor: error != null ? AppColors.primaryColor : AppColors.paidColor,
+        backgroundColor: error != null
+            ? AppColors.primaryColor
+            : AppColors.paidColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
       ),
     );
   }
@@ -55,9 +59,13 @@ class _ActiveScreensState extends State<ActiveScreens> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(error ?? 'Order delivered'),
-        backgroundColor: error != null ? AppColors.primaryColor : AppColors.paidColor,
+        backgroundColor: error != null
+            ? AppColors.primaryColor
+            : AppColors.paidColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
       ),
     );
   }
