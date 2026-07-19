@@ -30,10 +30,12 @@ class DelivereWidgets extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               DeliveredHeader(count: mockOrders.length),
+              SizedBox(height: 8.h),
               Flexible(
                 child: ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
                   itemCount: mockOrders.length,
                   itemBuilder: (context, index) {
                     return DeliveredOrder(order: mockOrders[index]);

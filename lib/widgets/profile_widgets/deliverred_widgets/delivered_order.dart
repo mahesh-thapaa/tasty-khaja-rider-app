@@ -28,7 +28,7 @@ class DeliveredOrder extends StatelessWidget {
                   Icon(
                     Icons.inventory_2_outlined,
                     color: AppColors.paidColor,
-                    size: 18.sp,
+                    size: 14.sp,
                   ),
                   SizedBox(width: 8.w),
                   Text(
@@ -36,7 +36,7 @@ class DeliveredOrder extends StatelessWidget {
                     style: TextStyle(
                       color: AppColors.shadowColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 15.sp,
+                      fontSize: 12.sp,
                     ),
                   ),
                 ],
@@ -46,14 +46,14 @@ class DeliveredOrder extends StatelessWidget {
                   Icon(
                     Icons.access_time,
                     color: AppColors.navBarColor,
-                    size: 16.sp,
+                    size: 12.sp,
                   ),
                   SizedBox(width: 4.w),
                   Text(
                     order.date,
                     style: TextStyle(
                       color: AppColors.navBarColor,
-                      fontSize: 13.sp,
+                      fontSize: 10.sp,
                     ),
                   ),
                 ],
@@ -72,7 +72,7 @@ class DeliveredOrder extends StatelessWidget {
                     Icon(
                       Icons.location_on_outlined,
                       color: AppColors.navBarColor,
-                      size: 18.sp,
+                      size: 14.sp,
                     ),
                     SizedBox(width: 4.w),
                     Expanded(
@@ -82,7 +82,7 @@ class DeliveredOrder extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: AppColors.navBarColor,
-                          fontSize: 14.sp,
+                          fontSize: 12.sp,
                         ),
                       ),
                     ),
@@ -94,7 +94,7 @@ class DeliveredOrder extends StatelessWidget {
                 style: TextStyle(
                   color: AppColors.primaryColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 16.sp,
+                  fontSize: 12.sp,
                 ),
               ),
             ],

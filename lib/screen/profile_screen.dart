@@ -71,16 +71,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.textColor,
-      body: Stack(
+      body: Column(
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: TopBar(topBarData: topBarData),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 90.h),
+          TopBar(topBarData: topBarData),
+
+          Expanded(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -112,40 +107,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.logout,
-                              color: AppColors.primaryColor,
-                              size: 20.w,
-                            ),
-                            SizedBox(width: 10.w),
-                            Text(
-                              "Logout",
-                              style: TextStyle(
-                                color: AppColors.primaryColor,
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                          children: _controller.isLoggingOut
+                              ? [
+                                  SizedBox(
+                                    height: 20.h,
+                                    width: 20.w,
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Text(
+                                    "Logging out...",
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ]
+                              : [
+                                  // Standard button contents
+                                  Icon(
+                                    Icons.logout,
+                                    color: AppColors.primaryColor,
+                                    size: 20.w,
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                         ),
                       ),
                     ),
                   ),
+                  SizedBox(height: 20.h),
                 ],
               ),
             ),
           ),
-          if (_controller.isLoggingOut)
-            Container(
-              height: 200.h,
-              alignment: Alignment.center,
-              child: const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  AppColors.primaryColor,
-                ),
-              ),
-            ),
         ],
       ),
       bottomNavigationBar: const ButtonNavBar(currentIndex: 3),
