@@ -109,14 +109,14 @@ class _LeadsScreenState extends State<LeadsScreen> {
                     ],
                   ),
 
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 12.h),
 
                   if (_controller.isFormVisible) ...[
                     InfoWidgets(
                       onSubmit: _handleSubmit,
                       isSubmitting: _controller.isSubmitting,
                     ),
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 12.h),
                   ],
                   if (_controller.isLoading)
                     const Center(
@@ -147,6 +147,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                     )
                   else
                     ListView.builder(
+                      padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: _controller.leads.length,

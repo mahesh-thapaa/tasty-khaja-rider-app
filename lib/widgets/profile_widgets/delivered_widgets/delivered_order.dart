@@ -14,6 +14,13 @@ class DeliveredOrder extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
       decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor.withValues(alpha: 0.04),
+            blurRadius: 12.r,
+            offset: const Offset(0, 4),
+          ),
+        ],
         color: AppColors.navBarColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.paymentBorderColor, width: 1),
