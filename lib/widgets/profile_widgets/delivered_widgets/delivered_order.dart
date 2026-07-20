@@ -79,7 +79,7 @@ class DeliveredOrder extends StatelessWidget {
                       child: Text(
                         order.location,
                         maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        // overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: AppColors.navBarColor,
                           fontSize: 12.sp,
