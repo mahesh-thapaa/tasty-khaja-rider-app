@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rider/components/map/map_view.dart';
+import 'package:rider/components/map_components/map_view.dart';
 import 'package:rider/const/app_colors.dart';
 import 'package:rider/models/active_models/order_active_models.dart';
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rider/const/app_colors.dart';
 import 'package:rider/models/pool_models/top_bar_models.dart';
+import 'package:rider/screen/profile_screen.dart';
 
 class TopBar extends StatelessWidget {
   final TopBarModels topBarData;
@@ -50,7 +51,14 @@ class TopBar extends StatelessWidget {
               ),
 
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                    ),
+                  );
+                },
                 icon: Icon(
                   Icons.person,
                   color: AppColors.textColor,

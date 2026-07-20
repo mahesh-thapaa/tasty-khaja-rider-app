@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rider/const/app_colors.dart';
 import 'package:rider/models/pool_models/order_models.dart';
-import '../../components/map/map_view.dart';
+import '../../components/map_components/map_view.dart';
 
 class OrderCardWidget extends StatelessWidget {
   final Order order;
