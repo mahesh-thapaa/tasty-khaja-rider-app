@@ -51,6 +51,22 @@ class _LeadsScreenState extends State<LeadsScreen> {
     );
   }
 
+  Future<void> _handleSave(InfoModels lead) async {
+    final error = await _controller.handleUpdate(lead);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error ?? 'Lead updated successfully'),
+        backgroundColor: error != null
+            ? AppColors.primaryColor
+            : AppColors.paidColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,7 +168,10 @@ class _LeadsScreenState extends State<LeadsScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: _controller.leads.length,
                       itemBuilder: (context, index) {
-                        return LeadItemCard(lead: _controller.leads[index]);
+                        return LeadItemCard(
+                          lead: _controller.leads[index],
+                          onSave: _handleSave,
+                        );
                       },
                     ),
                 ],

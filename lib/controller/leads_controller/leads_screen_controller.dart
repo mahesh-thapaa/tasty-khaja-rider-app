@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:rider/models/leeds_models/info_models.dart';
 import 'package:rider/services/leads/get_lead_services.dart';
 import 'package:rider/services/leads/lead_service.dart';
+import 'package:rider/services/leads/update_lead_services.dart';
 
 class LeadsScreenController extends ChangeNotifier {
   bool _isFormVisible = false;
@@ -11,6 +12,7 @@ class LeadsScreenController extends ChangeNotifier {
   List<InfoModels> _leads = [];
   final LeadService _leadService = LeadService();
   final GetLeadServices _getLeadServices = GetLeadServices();
+  final UpdateLeadServices _updateLeadServices = UpdateLeadServices();
   bool _disposed = false;
 
   bool get isFormVisible => _isFormVisible;
@@ -50,6 +52,25 @@ class LeadsScreenController extends ChangeNotifier {
       await _leadService.createLead(lead);
       if (_disposed) return null;
       _isFormVisible = false;
+      _isSubmitting = false;
+      if (!_disposed) notifyListeners();
+      await fetchLeads();
+      return null;
+    } catch (e) {
+      if (_disposed) return null;
+      _isSubmitting = false;
+      if (!_disposed) notifyListeners();
+      return e.toString().replaceFirst('Exception: ', '');
+    }
+  }
+
+  Future<String?> handleUpdate(InfoModels lead) async {
+    _isSubmitting = true;
+    notifyListeners();
+
+    try {
+      await _updateLeadServices.updateLead(lead);
+      if (_disposed) return null;
       _isSubmitting = false;
       if (!_disposed) notifyListeners();
       await fetchLeads();

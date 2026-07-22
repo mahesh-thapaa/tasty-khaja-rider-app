@@ -44,6 +44,11 @@ class _InfoWidgetsState extends State<InfoWidgets> {
     if (widget.onSubmit != null) {
       widget.onSubmit!(lead);
     }
+
+    nameController.clear();
+    organizationController.clear();
+    addressController.clear();
+    phoneController.clear();
   }
 
   Widget _buildField({
