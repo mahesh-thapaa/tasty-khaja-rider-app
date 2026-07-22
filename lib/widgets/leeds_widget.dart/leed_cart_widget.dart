@@ -8,6 +8,15 @@ class LeadItemCard extends StatelessWidget {
 
   const LeadItemCard({super.key, required this.lead});
 
+  String _formatDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return '';
+    try {
+      return dateStr.substring(0, 10);
+    } catch (_) {
+      return dateStr;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -52,7 +61,7 @@ class LeadItemCard extends StatelessWidget {
                   ),
                   SizedBox(width: 4.w),
                   Text(
-                    lead.createdAt ?? '',
+                    _formatDate(lead.createdAt),
                     style: TextStyle(
                       color: AppColors.navBarColor.withValues(alpha: 0.7),
                       fontSize: 11.sp,

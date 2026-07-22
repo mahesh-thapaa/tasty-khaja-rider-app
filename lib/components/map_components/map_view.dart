@@ -16,6 +16,8 @@ class MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final validLat = latitude.isFinite ? latitude : 0.0;
+    final validLng = longitude.isFinite ? longitude : 0.0;
     return SizedBox(
       height: 220.h,
       width: double.infinity,
@@ -23,7 +25,7 @@ class MapView extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         child: FlutterMap(
           options: MapOptions(
-            initialCenter: LatLng(latitude, longitude),
+            initialCenter: LatLng(validLat, validLng),
             initialZoom: 14.5,
             interactionOptions: const InteractionOptions(
               flags: InteractiveFlag.all,
@@ -37,7 +39,7 @@ class MapView extends StatelessWidget {
             MarkerLayer(
               markers: [
                 Marker(
-                  point: LatLng(latitude, longitude),
+                  point: LatLng(validLat, validLng),
                   width: 120.w,
                   height: 80.h,
                   child: Stack(
@@ -74,7 +76,7 @@ class MapView extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}',
+                                '${validLat.toStringAsFixed(4)}, ${validLng.toStringAsFixed(4)}',
                                 style: TextStyle(
                                   fontSize: 7.sp,
                                   color: AppColors.navBarColor,
