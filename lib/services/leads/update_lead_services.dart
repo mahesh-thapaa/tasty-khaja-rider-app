@@ -16,7 +16,9 @@ class UpdateLeadServices {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = response.data;
         if (responseData['success'] == true) {
-          return InfoModels.fromJson(responseData['data'] as Map<String, dynamic>);
+          return InfoModels.fromJson(
+            responseData['data'] as Map<String, dynamic>,
+          );
         }
         throw Exception(responseData['message'] ?? 'Failed to update lead');
       }

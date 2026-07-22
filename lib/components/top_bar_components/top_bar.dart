@@ -50,8 +50,8 @@ class TopBar extends StatelessWidget {
                 ],
               ),
 
-              IconButton(
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -59,15 +59,24 @@ class TopBar extends StatelessWidget {
                     ),
                   );
                 },
-                icon: Icon(
-                  Icons.person,
-                  color: AppColors.textColor,
-                  size: 20.w,
-                ),
-                style: IconButton.styleFrom(
-                  backgroundColor: AppColors.textColor.withValues(alpha: 0.15),
-                  minimumSize: Size(38.w, 38.w),
-                  padding: EdgeInsets.zero,
+                child: Container(
+                  width: 38.w,
+                  height: 38.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.textColor.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    topBarData.userName.isNotEmpty
+                        ? topBarData.userName[0].toUpperCase()
+                        : '?',
+                    style: TextStyle(
+                      color: AppColors.textColor,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],
