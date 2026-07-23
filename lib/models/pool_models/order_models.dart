@@ -4,10 +4,7 @@ class Coordinates {
   final double latitude;
   final double longitude;
 
-  Coordinates({
-    required this.latitude,
-    required this.longitude,
-  });
+  Coordinates({required this.latitude, required this.longitude});
 
   factory Coordinates.fromJson(Map<String, dynamic> json) {
     return Coordinates(
@@ -51,21 +48,17 @@ class Order {
         .map((item) => OrderItem.fromJson(item))
         .toList();
 
-    // Calculate subtotal from items
     final calculatedSubtotal = parsedItems.fold(
       0.0,
       (sum, item) => sum + (item.price * item.quantity),
     );
 
-    // Read total amount from backend response
     final apiTotal = (json['totalAmount'] as num?)?.toDouble() ?? 0.0;
 
-    // Deduce delivery charge or fall back to 0.0 if not available
-    final calculatedDeliveryCharge = apiTotal > calculatedSubtotal 
-        ? apiTotal - calculatedSubtotal 
+    final calculatedDeliveryCharge = apiTotal > calculatedSubtotal
+        ? apiTotal - calculatedSubtotal
         : 0.0;
 
-    // Parse location values
     final addressData = json['deliveryAddress'] ?? {};
     final addressLine = addressData['addressLine'] ?? '';
     final city = addressData['city'] ?? '';
@@ -76,10 +69,10 @@ class Order {
     return Order(
       id: json['orderId'] ?? json['_id'] ?? '',
       mongoId: json['_id'] ?? '',
-      paymentMethod: json['paymentMethod'] ?? 'COD', // Default value if not specified
+      paymentMethod: json['paymentMethod'] ?? 'COD',
       deliveryLocationName: fullAddress,
       coordinates: Coordinates.fromJson(json['userLocation'] ?? {}),
-      distance: '${json['distance'] ?? 0.0} km', // Format distance as a display String
+      distance: '${json['distance'] ?? 0.0} km',
       items: parsedItems,
       deliveryCharge: calculatedDeliveryCharge,
     );
