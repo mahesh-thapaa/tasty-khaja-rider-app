@@ -14,8 +14,12 @@ class MarkDeliveredService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = response.data;
         if (responseData['success'] != true) {
-          throw Exception(responseData['message'] ?? 'Failed to mark as delivered');
+          throw Exception(
+            responseData['message'] ?? 'Failed to mark as delivered',
+          );
         }
+      } else {
+        throw Exception('Server returned status code: ${response.statusCode}');
       }
     } on DioException catch (e) {
       final errorMessage =

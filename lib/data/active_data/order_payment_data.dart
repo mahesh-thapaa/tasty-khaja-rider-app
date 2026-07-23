@@ -13,4 +13,5 @@ final sampleOrder = OrderActiveModels(
   customerPhone: '9819198551',
   items: [OrderItem(name: 'Prawn rice (Full)', quantity: 1, price: 180.0)],
   deliveryCharge: 0.0,
+  status: "",
 );

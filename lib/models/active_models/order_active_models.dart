@@ -12,6 +12,7 @@ class OrderActiveModels {
   final double deliveryCharge;
   final String customerName;
   final String customerPhone;
+  final String status;
 
   OrderActiveModels({
     required this.id,
@@ -24,6 +25,7 @@ class OrderActiveModels {
     required this.deliveryCharge,
     required this.customerName,
     required this.customerPhone,
+    required this.status,
   });
 
   double get subtotal {
@@ -59,6 +61,7 @@ class OrderActiveModels {
       deliveryCharge: (json['deliveryCharge'] as num?)?.toDouble() ?? 0.0,
       customerName: user['fullName'] ?? '',
       customerPhone: user['phone'] ?? '',
+      status: json['status'] ?? '',
     );
   }
 }

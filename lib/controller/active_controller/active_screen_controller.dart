@@ -8,6 +8,7 @@ class ActiveScreenController extends ChangeNotifier {
   final ActiveService _activeService = ActiveService();
   final MarkPaidService _markPaidService = MarkPaidService();
   final MarkDeliveredService _markDeliveredService = MarkDeliveredService();
+
   List<OrderActiveModels> _active = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -27,7 +28,7 @@ class ActiveScreenController extends ChangeNotifier {
     try {
       final orders = await _activeService.getMyOrders();
       if (_disposed) return;
-      _active = orders;
+      _active = orders.where((o) => o.status != 'Delivered').toList();
       _isLoading = false;
     } catch (e) {
       if (_disposed) return;
@@ -37,7 +38,10 @@ class ActiveScreenController extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
-  Future<String?> markPaid(OrderActiveModels order, String paymentMethod) async {
+  Future<String?> markPaid(
+    OrderActiveModels order,
+    String paymentMethod,
+  ) async {
     try {
       await _markPaidService.markOrderPaid(
         order.mongoId,
@@ -45,7 +49,7 @@ class ActiveScreenController extends ChangeNotifier {
       );
       if (_disposed) return null;
       _paidOrderIds.add(order.mongoId);
-      if (!_disposed) notifyListeners();
+      notifyListeners();
       return null;
     } catch (e) {
       return e.toString().replaceFirst('Exception: ', '');
@@ -54,12 +58,18 @@ class ActiveScreenController extends ChangeNotifier {
 
   Future<String?> markDelivered(OrderActiveModels order) async {
     try {
+      debugPrint("Marking delivered for mongoId: ${order.mongoId}");
+
       await _markDeliveredService.markOrderDelivered(order.mongoId);
       if (_disposed) return null;
+
+      // Remove order from local list by comparing mongoId
       _active.removeWhere((o) => o.mongoId == order.mongoId);
-      if (!_disposed) notifyListeners();
-      return null;
+
+      notifyListeners();
+      return null; // Return null when successful
     } catch (e) {
+      debugPrint("Error in markDelivered controller: $e");
       return e.toString().replaceFirst('Exception: ', '');
     }
   }

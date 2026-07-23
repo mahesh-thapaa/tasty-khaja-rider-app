@@ -27,7 +27,9 @@ class _ActiveScreensState extends State<ActiveScreens> {
     _controller.fetchOrders();
   }
 
-  void _onChanged() => setState(() {});
+  void _onChanged() {
+    if (mounted) setState(() {});
+  }
 
   @override
   void dispose() {
@@ -37,31 +39,41 @@ class _ActiveScreensState extends State<ActiveScreens> {
   }
 
   Future<void> _markPaid(OrderActiveModels order, String paymentMethod) async {
+    _showLoadingDialog();
     final error = await _controller.markPaid(order, paymentMethod);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error ?? 'Payment received'),
-        backgroundColor: error != null
-            ? AppColors.primaryColor
-            : AppColors.paidColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
+    Navigator.of(context).pop(); // Close loading dialog
+
+    _showSnackBar(message: error ?? 'Payment received', isError: error != null);
+  }
+
+  Future<void> _markDelivered(OrderActiveModels order) async {
+    _showLoadingDialog();
+    final error = await _controller.markDelivered(order);
+    if (!mounted) return;
+    Navigator.of(context).pop(); // Close loading dialog
+
+    _showSnackBar(
+      message: error ?? 'Order delivered successfully',
+      isError: error != null,
+    );
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: AppColors.primaryColor),
       ),
     );
   }
 
-  Future<void> _markDelivered(OrderActiveModels order) async {
-    final error = await _controller.markDelivered(order);
-    if (!mounted) return;
+  void _showSnackBar({required String message, required bool isError}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(error ?? 'Order delivered'),
-        backgroundColor: error != null
-            ? AppColors.primaryColor
-            : AppColors.paidColor,
+        content: Text(message),
+        backgroundColor: isError ? AppColors.primaryColor : AppColors.paidColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
@@ -78,7 +90,6 @@ class _ActiveScreensState extends State<ActiveScreens> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TopBar(topBarData: topBarData),
-
           Expanded(
             child: RefreshIndicator(
               onRefresh: _controller.fetchOrders,
@@ -119,7 +130,7 @@ class _ActiveScreensState extends State<ActiveScreens> {
           ),
         ],
       ),
-      bottomNavigationBar: ButtonNavBar(currentIndex: 1),
+      bottomNavigationBar: const ButtonNavBar(currentIndex: 1),
     );
   }
 

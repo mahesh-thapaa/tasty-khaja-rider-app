@@ -1717,7 +1717,38 @@ Fails with `400` if changing `email` collides with an existing user's email.
 
 ## Rider Endpoints
 
-##z
+### 1. Get Available Orders
+**Endpoint:** `GET /rider/orders/available`  
+**Auth:** Required (Rider)
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439020",
+      "orderId": "ORD-1705856400000",
+      "items": [...],
+      "totalAmount": 590,
+      "status": "Ready for Delivery",
+      "deliveryAddress": {
+        "addressLine": "123 Main Street",
+        "city": "Pokhara",
+        "phone": "+977981234567"
+      },
+      "userLocation": {
+        "lat": 28.193823,
+        "lng": 83.977514
+      },
+      "distance": 2.5,
+      "user": {
+        "fullName": "John Doe",
+        "phone": "+977981234567"
+      }
+    }
+  ]
+}
 ```
 
 ---
