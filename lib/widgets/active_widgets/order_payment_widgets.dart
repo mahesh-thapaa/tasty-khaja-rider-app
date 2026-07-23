@@ -255,6 +255,17 @@ class _OrderPaymentWidgetsState extends State<OrderPaymentWidgets> {
                   ),
                 ),
               ],
+
+              if (selectedMethod == 'Online') ...[
+                SizedBox(height: 12.h),
+                Center(
+                  child: Image.asset(
+                    'assets/QR.png',
+                    width: 200.w,
+                    height: 200.h,
+                  ),
+                ),
+              ],
             ],
           ),
           SizedBox(height: 12.h),
