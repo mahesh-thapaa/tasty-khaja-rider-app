@@ -63,11 +63,10 @@ class ActiveScreenController extends ChangeNotifier {
       await _markDeliveredService.markOrderDelivered(order.mongoId);
       if (_disposed) return null;
 
-      // Remove order from local list by comparing mongoId
       _active.removeWhere((o) => o.mongoId == order.mongoId);
 
       notifyListeners();
-      return null; // Return null when successful
+      return null; 
     } catch (e) {
       debugPrint("Error in markDelivered controller: $e");
       return e.toString().replaceFirst('Exception: ', '');
